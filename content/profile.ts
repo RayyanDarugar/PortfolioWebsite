@@ -4,6 +4,8 @@
 
 export const PROFILE = {
   name: 'Rayyan Darugar',
+  /** Written on the whiteboard: the page's h1. Draft; Rayyan writes the real line. */
+  intro: "Hi, I'm Rayyan Darugar.",
   /** The line under his name in the room. */
   tagline: 'Trying to make the world more beautiful.',
   /** The line under his name on the résumé. */

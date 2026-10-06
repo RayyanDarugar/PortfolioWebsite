@@ -13,12 +13,19 @@
   --font-ui: var(--font-lato), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
   --font-pixel: var(--font-departure), ui-monospace, monospace;
+  --font-marker: var(--font-gochi), cursive;
 }
 
 :root { color-scheme: light }
 body { font-family: var(--font-display); color: var(--color-ink); background: #000; }
 
 .tabular { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* A room object, lit by hover, focus or its hotbar slot. */
+.room-sprite { transition: filter .15s ease-out; }
+.room-sprite[data-lit='true'] {
+  filter: drop-shadow(0 0 1px #fff7da) drop-shadow(0 0 7px rgba(255, 207, 90, .95));
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Archivo, JetBrains_Mono, Lato } from 'next/font/google'
+import { Archivo, Gochi_Hand, JetBrains_Mono, Lato } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { OS } from '@/components/os/OS'
@@ -10,6 +10,9 @@ import { PROFILE } from '@/content/profile'
 const archivo = Archivo({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'], variable: '--font-archivo' })
 const lato = Lato({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-lato' })
 const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500', '700'], variable: '--font-jetbrains' })
+
+/** The whiteboard's marker hand. */
+const marker = Gochi_Hand({ subsets: ['latin'], weight: '400', variable: '--font-gochi' })
 
 /** DepartureMono: self-hosted because it is not on Google Fonts. One weight. */
 const pixel = localFont({
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${lato.variable} ${mono.variable} ${pixel.variable}`}>
+    <html lang="en" className={`${archivo.variable} ${lato.variable} ${mono.variable} ${pixel.variable} ${marker.variable}`}>
       {/* The room and the laptop live here, not in a page, so they survive
           navigation between /, /work and /work/[app] and can animate between
           them. The pages only make those URLs real and give them titles. */}
