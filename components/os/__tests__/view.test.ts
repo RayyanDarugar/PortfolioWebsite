@@ -42,12 +42,10 @@ describe('isAppId', () => {
 })
 
 describe('room overlays', () => {
-  it('are the card paths and nothing else', () => {
-    expect(isRoomOverlay('/cards/dog')).toBe(true)
-    expect(isRoomOverlay('/cards/dog/')).toBe(true)
-    expect(isRoomOverlay('/cards')).toBe(false)
-    expect(isRoomOverlay('/')).toBe(false)
-    expect(isRoomOverlay('/work/resume')).toBe(false)
+  it('are the overlay paths and nothing else', () => {
+    for (const p of ['/cards/dog', '/cards/dog/', '/music', '/books', '/books/contact', '/journal',
+      '/journal/on-beauty', '/places', '/places/milan', '/san-diego']) expect(isRoomOverlay(p), p).toBe(true)
+    for (const p of ['/cards', '/', '/work/resume', '/books/a/b', '/musics']) expect(isRoomOverlay(p), p).toBe(false)
   })
 
   it('round-trip through cardPath', () => {

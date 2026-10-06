@@ -51,6 +51,14 @@ describe('the room', () => {
     expect(consumeOpenedInApp()).toBe(true)
   })
 
+  it('opens an interaction from its object, marked as opened in the site', () => {
+    consumeOpenedInApp()
+    render(<OS />)
+    fireEvent.click(screen.getByRole('button', { name: /^Record player:/ }))
+    expect(nav.push).toHaveBeenCalledWith('/music', PUSH_OPTS)
+    expect(consumeOpenedInApp()).toBe(true)
+  })
+
   it('has hotbar slots that act exactly like their objects', () => {
     render(<OS />)
     fireEvent.click(screen.getByRole('button', { name: '1: Work' }))
@@ -69,7 +77,7 @@ describe('the room', () => {
   it('number keys pick hotbar slots', () => {
     render(<OS />)
     fireEvent.keyDown(window, { key: '2' })
-    expect(nav.push).toHaveBeenCalledWith('/cards/journal', PUSH_OPTS)
+    expect(nav.push).toHaveBeenCalledWith('/journal', PUSH_OPTS)
     expect(HOTBAR[1].objects).toEqual(['journal'])
   })
 

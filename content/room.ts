@@ -6,11 +6,11 @@ import sprites from '@/public/room/sprites.json'
  * (public/room/sprites.json), so moving an object is re-cutting the art, not
  * editing here.
  *
- * Phase 3: the record player, bookshelf, journal, globe and window open a
- * game card saying what is coming. Phase 4 points them at their own overlays.
+ * The record player, bookshelf, journal, globe and window open their own
+ * overlays (phase 4).
  */
 
-export type RoomAction = { kind: 'zoom' } | { kind: 'card'; card: string }
+export type RoomAction = { kind: 'zoom' } | { kind: 'card'; card: string } | { kind: 'overlay'; href: string }
 
 export interface RoomObject {
   id: string
@@ -30,16 +30,16 @@ export interface HotbarSlot {
 
 export const ROOM_OBJECTS: readonly RoomObject[] = [
   { id: 'laptop', label: 'Laptop', hint: 'Work, résumé and contact', action: { kind: 'zoom' } },
-  { id: 'journal', label: 'Journal', hint: 'Things I think about', action: { kind: 'card', card: 'journal' } },
-  { id: 'record-player', label: 'Record player', hint: 'Songs I love', action: { kind: 'card', card: 'music' } },
-  { id: 'bookshelf', label: 'Bookshelf', hint: 'Books I recommend', action: { kind: 'card', card: 'books' } },
-  { id: 'globe', label: 'Globe', hint: "Places I've been", action: { kind: 'card', card: 'travel' } },
+  { id: 'journal', label: 'Journal', hint: 'Things I think about', action: { kind: 'overlay', href: '/journal' } },
+  { id: 'record-player', label: 'Record player', hint: 'Songs I love', action: { kind: 'overlay', href: '/music' } },
+  { id: 'bookshelf', label: 'Bookshelf', hint: 'Books I recommend', action: { kind: 'overlay', href: '/books' } },
+  { id: 'globe', label: 'Globe', hint: "Places I've been", action: { kind: 'overlay', href: '/places' } },
   { id: 'whiteboard', label: 'Whiteboard', hint: "What I'm building", action: { kind: 'card', card: 'building' } },
   { id: 'flags', label: 'Flags', hint: 'USC, HKUST and Bocconi', action: { kind: 'card', card: 'school-usc' } },
   { id: 'surfboard', label: 'Surfboard', hint: 'The board', action: { kind: 'card', card: 'surfboard' } },
   { id: 'photo-dog', label: 'Photo', hint: 'My dog', action: { kind: 'card', card: 'dog' } },
   { id: 'photo-beach', label: 'Photo', hint: 'San Diego', action: { kind: 'card', card: 'beach' } },
-  { id: 'window', label: 'Window', hint: 'San Diego, right now', action: { kind: 'card', card: 'san-diego' } },
+  { id: 'window', label: 'Window', hint: 'San Diego, right now', action: { kind: 'overlay', href: '/san-diego' } },
 ]
 
 export const HOTBAR: readonly HotbarSlot[] = [

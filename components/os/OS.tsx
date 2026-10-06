@@ -2,7 +2,7 @@
 import { MotionConfig, motion, useMotionValue, useSpring } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { markOverlayOpenedInApp } from '@/components/overlays/history'
+import { markOverlayOpenedInApp, resetOverlayDepth } from '@/components/overlays/history'
 import { Hotbar } from '@/components/room/Hotbar'
 import { RoomBackdrop } from '@/components/room/RoomBackdrop'
 import { RoomBar } from '@/components/room/RoomBar'
@@ -97,11 +97,9 @@ export function OS() {
     const object = ROOM_OBJECTS.find((o) => o.id === id)
     if (!object) return
     opener.current = id
-    if (object.action.kind === 'zoom') openLaptop()
-    else {
-      markOverlayOpenedInApp()
-      go(cardPath(object.action.card))
-    }
+    if (object.action.kind === 'zoom') { openLaptop(); return }
+    markOverlayOpenedInApp()
+    go(object.action.kind === 'card' ? cardPath(object.action.card) : object.action.href)
   }, [openLaptop, go])
   const activateSlot = useCallback((slot: HotbarSlot) => activate(slot.objects[0]), [activate])
 
@@ -185,6 +183,9 @@ export function OS() {
       document.documentElement.removeEventListener('pointerleave', onLeave)
     }
   }, [roomActive, zoom.rest, panTarget])
+
+  // The room is showing: no overlay steps are left to undo.
+  useEffect(() => { if (!overlayOpen) resetOverlayDepth() }, [overlayOpen])
 
   // Closing a card hands focus back to the object that opened it (spec §8).
   useEffect(() => {

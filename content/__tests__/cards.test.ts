@@ -6,7 +6,7 @@ import { getCard, getCards, siblings } from '../cards'
 describe('the cards', () => {
   it('all parse, with unique ids and the required fields', () => {
     const cards = getCards()
-    expect(cards.length).toBe(12)
+    expect(cards.length).toBe(7)
     expect(new Set(cards.map((c) => c.id)).size).toBe(cards.length)
     for (const c of cards) {
       expect(c.tag && c.title && c.photo).toBeTruthy()

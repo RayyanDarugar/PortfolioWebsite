@@ -37,10 +37,12 @@ export function pathFor(view: View): string {
   return view.app ? `/work/${view.app}` : '/work'
 }
 
-/** Paths the room opens over itself. Phase 3: the game cards. Phase 4 adds the
- *  record player, bookshelf, journal, globe and window overlays here. */
+const ROOM_OVERLAY =
+  /^\/(?:cards\/[^/]+|music|books(?:\/[^/]+)?|journal(?:\/[^/]+)?|places(?:\/[^/]+)?|san-diego)\/?$/
+
+/** Paths the room opens over itself: game cards and the five interactions. */
 export function isRoomOverlay(pathname: string): boolean {
-  return /^\/cards\/[^/]+\/?$/.test(pathname)
+  return ROOM_OVERLAY.test(pathname)
 }
 
 export function cardPath(id: string): string {

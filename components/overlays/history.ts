@@ -1,22 +1,24 @@
 /**
- * Whether the overlay on screen was opened from inside the site.
- *
- * Closing such an overlay goes back in history rather than pushing `/`, so the
- * browser's Back afterwards leaves the room instead of reopening what was just
- * closed. An overlay reached from a pasted link has nothing in the site to go
- * back to, so it closes by pushing `/`. Module state: it lasts as long as the
- * page, which is exactly the span "opened inside the site" means anything in.
+ * How many overlay steps were taken inside the site since the room last
+ * showed: room → shelf is one, shelf → book another. Closing an overlay goes
+ * back while there are steps to undo, so Back afterwards leaves the room
+ * instead of reopening what was just closed; with none (a pasted link) it
+ * pushes the room. The OS root resets it whenever the room is showing.
  */
 
-let openedInApp = false
+let depth = 0
 
 export function markOverlayOpenedInApp(): void {
-  openedInApp = true
+  depth += 1
 }
 
-/** Reads and clears the mark: one close per open. */
+/** True (and one step fewer) when closing should go back. */
 export function consumeOpenedInApp(): boolean {
-  const was = openedInApp
-  openedInApp = false
-  return was
+  if (depth === 0) return false
+  depth -= 1
+  return true
+}
+
+export function resetOverlayDepth(): void {
+  depth = 0
 }
