@@ -9,6 +9,7 @@ import { RoomBar } from '@/components/room/RoomBar'
 import { RoomScene } from '@/components/room/RoomScene'
 import { WhiteboardIntro } from '@/components/room/WhiteboardIntro'
 import { panFor } from '@/components/room/layout'
+import { useTimeOfDay } from '@/components/room/useTimeOfDay'
 import { HOTBAR, ROOM_OBJECTS, type HotbarSlot } from '@/content/room'
 import { DesktopItems } from './DesktopItems'
 import { Dock } from './Dock'
@@ -63,6 +64,7 @@ export function OS() {
   const view = viewFromPath(pathname) ?? ROOM
   const overlayOpen = isRoomOverlay(pathname)
   const reduced = useReducedMotion()
+  const { variant } = useTimeOfDay()
 
   const panTarget = useMotionValue(0)
   const panSpring = useSpring(panTarget, { stiffness: 140, damping: 26, mass: 0.6 })
@@ -229,8 +231,8 @@ export function OS() {
           inert={!landed}
           live={landed}
           room={(
-            <RoomScene lit={lit} disabled={!roomActive} onActivate={activate}>
-              <WhiteboardIntro />
+            <RoomScene lit={lit} disabled={!roomActive} onActivate={activate} variant={variant}>
+              <WhiteboardIntro variant={variant} />
             </RoomScene>
           )}
         >

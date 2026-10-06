@@ -6,6 +6,7 @@ import { ROOM_OBJECTS, spriteFor, type RoomObject } from '@/content/room'
 import sprites from '@/public/room/sprites.json'
 import { hitAt, loadHitMap, type HitMap } from './hitmap'
 import { toArt } from './layout'
+import type { Variant } from './timeOfDay'
 
 const PIXELATED = { imageRendering: 'pixelated' } as const
 const pct = (n: number, of: number) => `${(n / of) * 100}%`
@@ -48,12 +49,15 @@ function Tooltip({ object }: { object: RoomObject }) {
  * own on-screen box, so pan and zoom transforms are already accounted for.
  */
 export function RoomScene({
-  lit, disabled, onActivate, children,
+  lit, disabled, onActivate, children, variant = 'sunset',
 }: {
   lit: readonly string[]
   disabled: boolean
   onActivate: (id: string) => void
   children?: ReactNode
+  /** The lighting. There are no day or night base layers, so those use their
+   *  full picture as the base, with their own sprites on top (identical pixels). */
+  variant?: Variant
 }) {
   const [map, setMap] = useState<HitMap | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
@@ -88,12 +92,12 @@ export function RoomScene({
         if (id) onActivate(id)
       }}
     >
-      <Image src="/room/base.png" alt="" fill priority sizes="112vw" style={PIXELATED} />
+      <Image src={variant === 'sunset' ? '/room/base.png' : `/room/${variant}.png`} alt="" fill priority sizes="112vw" style={PIXELATED} />
 
       {sprites.sprites.map((s) => (
         <Image
           key={s.id}
-          src={`/room/sprites/${s.id}.png`}
+          src={variant === 'sunset' ? `/room/sprites/${s.id}.png` : `/room/sprites/${s.id}.${variant}.png`}
           alt=""
           width={s.w}
           height={s.h}

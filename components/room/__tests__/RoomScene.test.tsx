@@ -48,3 +48,12 @@ describe('WhiteboardIntro', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain(PROFILE.name)
   })
 })
+
+describe('RoomScene at night', () => {
+  it('draws the night art', () => {
+    const { container } = render(<RoomScene lit={[]} disabled={false} onActivate={() => {}} variant="night" />)
+    const srcs = [...container.querySelectorAll('img')].map((i) => decodeURIComponent(i.getAttribute('src') ?? ''))
+    expect(srcs.some((s) => s.includes('/room/night.png'))).toBe(true)
+    expect(srcs.some((s) => s.includes('/room/sprites/laptop.night.png'))).toBe(true)
+  })
+})
