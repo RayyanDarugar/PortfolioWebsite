@@ -20,7 +20,7 @@
 import sharp from 'sharp'
 import { mkdirSync, writeFileSync } from 'node:fs'
 
-const MASTER = 'docs/mockups/masters/a3-dog-board-1.png'
+const MASTER = 'docs/mockups/masters/master-lettered.png' // a3-dog-board-1.png + letter-flags.mjs
 const EMPTY = 'docs/mockups/masters/empty-4-flux.png'
 const MATTES = 'docs/mockups/masters/mattes'
 const OUT = 'public/room'
@@ -30,8 +30,8 @@ const OUT = 'public/room'
  *  at rest a variant is its full image, and the base only matters once an
  *  object moves (phase 4). */
 const VARIANTS = {
-  day: 'docs/mockups/masters/day-1.png',
-  night: 'docs/mockups/masters/night-1.png',
+  day: 'docs/mockups/masters/day-lettered.png',
+  night: 'docs/mockups/masters/night-lettered.png',
 }
 
 /**
