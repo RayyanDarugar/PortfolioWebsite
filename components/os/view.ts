@@ -7,7 +7,7 @@
  * button and a pasted link all go through the same path.
  */
 
-export const APP_IDS = ['resume', 'contact'] as const
+export const APP_IDS = ['resume', 'about', 'videos', 'contact'] as const
 export type AppId = (typeof APP_IDS)[number]
 
 export interface View {

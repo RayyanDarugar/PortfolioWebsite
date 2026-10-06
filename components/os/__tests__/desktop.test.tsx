@@ -30,7 +30,7 @@ describe('Dock', () => {
     render(<Dock apps={APPS} active={0} onSelect={onSelect} registerTile={() => {}} />)
     const dock = screen.getByRole('navigation', { name: 'Apps' })
     fireEvent.click(within(dock).getByRole('button', { name: 'Contact' }))
-    expect(onSelect).toHaveBeenCalledWith(1)
+    expect(onSelect).toHaveBeenCalledWith(APPS.findIndex((app) => app.id === 'contact'))
     expect(within(dock).getByRole('button', { name: 'Résumé' }).getAttribute('aria-current')).toBe('true')
   })
 })

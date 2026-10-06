@@ -1,7 +1,9 @@
 import type { ComponentType } from 'react'
+import { AboutApp } from './apps/AboutApp'
 import { ContactApp } from './apps/ContactApp'
 import { ResumeApp } from './apps/ResumeApp'
-import { DocGlyph, MailGlyph } from './icons'
+import { VideosApp } from './apps/VideosApp'
+import { DocGlyph, FilmGlyph, MailGlyph, SunGlyph } from './icons'
 import type { WindowFrame } from './stage'
 import type { AppId } from './view'
 
@@ -26,8 +28,8 @@ export interface AppDef {
 }
 
 /**
- * The laptop's apps, in dock order. Phase 5 adds Projects, The Attention
- * Exchange and About; adding one is an entry here plus its id in view.ts.
+ * The laptop's apps, in dock order. Projects and The Attention Exchange are
+ * still to come; adding one is an entry here plus its id in view.ts.
  */
 export const APPS: readonly AppDef[] = [
   {
@@ -35,6 +37,18 @@ export const APPS: readonly AppDef[] = [
     frame: { w: 980, h: 0.9, dx: -0.04, dy: 0 },
     tile: 'linear-gradient(#FFFFFF,#C9D3DF)',
     Scene: ResumeApp,
+  },
+  {
+    id: 'about', name: 'About', Glyph: SunGlyph, inset: 11,
+    frame: { w: 880, h: 0.82, dx: 0.05, dy: 0.01 },
+    tile: 'linear-gradient(#FFC36E,#E0682C)',
+    Scene: AboutApp,
+  },
+  {
+    id: 'videos', name: 'Videos', Glyph: FilmGlyph, inset: 11,
+    frame: { w: 1240, h: 0.9, dx: -0.02, dy: -0.01 },
+    tile: 'linear-gradient(#4E5560,#22262D)',
+    Scene: VideosApp,
   },
   {
     id: 'contact', name: 'Contact', Glyph: MailGlyph, inset: 10,

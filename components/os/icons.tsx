@@ -114,3 +114,26 @@ export function DocGlyph() {
     </svg>
   )
 }
+
+/** A sun on the horizon: the About app, whose mission is beauty. */
+export function SunGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden fill="none"
+         stroke="#fff" strokeWidth="1.9" strokeLinecap="round">
+      <path d="M6.5 16a5.5 5.5 0 0 1 11 0" />
+      <path d="M3 19.5h18M12 5v2.4M5.2 8.6l1.7 1.7M18.8 8.6l-1.7 1.7M2.8 15.6h1.8M19.4 15.6h1.8" />
+    </svg>
+  )
+}
+
+/** A clapperboard: the Videos app. */
+export function FilmGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden>
+      <rect x="3" y="9" width="18" height="11.5" rx="2" fill="#fff" />
+      <path d="M3.4 8.2 20 4.6l.6 2.8L4 11Z" fill="#fff" />
+      <path d="M7.4 7.3 9.6 9.9M12 6.3l2.2 2.6M16.6 5.3l2.2 2.6" stroke="#2B2E34" strokeWidth="1.4" />
+      <path d="M10.3 12.6v5l4.4-2.5Z" fill="#2B2E34" />
+    </svg>
+  )
+}
