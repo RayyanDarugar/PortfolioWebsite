@@ -20,8 +20,6 @@ export interface Zoom {
   measured: boolean
   /** The room at rest, unpanned, in viewport px. Null until measured. */
   rest: G.Rect | null
-  /** The laptop's screen at rest, in viewport px (unpanned). Removed with RoomChrome. */
-  hit: G.Rect | null
   /** The pan, faded out by the zoom: `pan × (1 − z)`, so landing is never offset. */
   roomX: MotionValue<number>
   camera: MotionValue<string>
@@ -105,7 +103,6 @@ export function useZoom(zoomed: boolean, reduced: boolean, pan?: MotionValue<num
     resting,
     measured,
     rest,
-    hit: rest ? G.hole(0, vw, vh, rest) : null,
     roomX,
     camera,
     clip,

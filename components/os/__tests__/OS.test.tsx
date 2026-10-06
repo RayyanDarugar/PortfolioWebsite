@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { PROFILE } from '@/content/profile'
+import { HOTBAR } from '@/content/room'
 
 const nav = vi.hoisted(() => {
   const push = vi.fn()
@@ -29,37 +30,52 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllGlobals() })
 
 describe('the room', () => {
-  it('introduces him and puts the Résumé one click away', () => {
+  it('introduces him on the whiteboard and puts the Résumé one click away', () => {
     render(<OS />)
-    expect(screen.getByRole('heading', { level: 1, name: PROFILE.name })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain(PROFILE.name)
     expect(screen.getByRole('link', { name: 'Résumé' }).getAttribute('href')).toBe('/work/resume')
   })
 
-  it('opens the laptop on click', () => {
+  it('opens the laptop from the laptop', () => {
     render(<OS />)
-    fireEvent.click(screen.getByRole('button', { name: 'Open the laptop' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Laptop:/ }))
     expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
   })
 
-  // It is hidden from assistive tech (the named button is the same action), so
-  // it must never take focus: a focused aria-hidden element is a dead end.
-  it('the laptop hit area opens the laptop and cannot take focus', () => {
+  it('opens a game card from an object', () => {
     render(<OS />)
-    const hit = document.querySelector<HTMLElement>('[title="Open the laptop"]')!
-    hit.focus()
-    expect(document.activeElement).not.toBe(hit)
-    fireEvent.click(hit)
-    expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
+    fireEvent.click(screen.getByRole('button', { name: 'Photo: My dog' }))
+    expect(nav.push).toHaveBeenCalledWith('/cards/dog', PUSH_OPTS)
   })
 
-  // The Résumé link keeps focus after a click while the room fades; it must not
-  // end up inside an aria-hidden subtree (browsers block that and warn).
-  it('never hides the focused Résumé link from assistive tech', () => {
-    const { rerender } = render(<OS />)
-    screen.getByRole('link', { name: 'Résumé' }).focus()
-    at('/work/resume')
-    rerender(<OS />)
-    expect(document.activeElement?.closest('[aria-hidden="true"]')).toBeNull()
+  it('has hotbar slots that act exactly like their objects', () => {
+    render(<OS />)
+    fireEvent.click(screen.getByRole('button', { name: '1: Work' }))
+    expect(nav.push).toHaveBeenLastCalledWith('/work', PUSH_OPTS)
+    fireEvent.click(screen.getByRole('button', { name: '7: Schools' }))
+    expect(nav.push).toHaveBeenLastCalledWith('/cards/school-usc', PUSH_OPTS)
+  })
+
+  it('lights the objects a hotbar slot names', () => {
+    const { container } = render(<OS />)
+    fireEvent.mouseEnter(screen.getByRole('button', { name: '9: Photos' }))
+    const lit = [...container.querySelectorAll('img[data-lit="true"]')].map((i) => i.getAttribute('data-sprite'))
+    expect(lit.sort()).toEqual(['photo-beach', 'photo-dog'])
+  })
+
+  it('number keys pick hotbar slots', () => {
+    render(<OS />)
+    fireEvent.keyDown(window, { key: '2' })
+    expect(nav.push).toHaveBeenCalledWith('/cards/journal', PUSH_OPTS)
+    expect(HOTBAR[1].objects).toEqual(['journal'])
+  })
+
+  it('number keys with a modifier are left to the browser', () => {
+    render(<OS />)
+    fireEvent.keyDown(window, { key: '1', metaKey: true })
+    fireEvent.keyDown(window, { key: '1', ctrlKey: true })
+    fireEvent.keyDown(window, { key: '1', altKey: true })
+    expect(nav.push).not.toHaveBeenCalled()
   })
 
   it('a burst of wheel events navigates once', () => {
@@ -76,10 +92,50 @@ describe('the room', () => {
     expect(nav.push).not.toHaveBeenCalled()
   })
 
+  it('never hides the focused Résumé link from assistive tech', () => {
+    const { rerender } = render(<OS />)
+    screen.getByRole('link', { name: 'Résumé' }).focus()
+    at('/work/resume')
+    rerender(<OS />)
+    expect(document.activeElement?.closest('[aria-hidden="true"]')).toBeNull()
+  })
+
   it('falls back to the room on an unknown path', () => {
     at('/work/nope')
     render(<OS />)
-    expect(screen.getByRole('button', { name: 'Open the laptop' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /^Laptop:/ })).toBeTruthy()
+  })
+
+  it('hotbar keys do nothing on the desktop', () => {
+    at('/work')
+    render(<OS />)
+    fireEvent.keyDown(window, { key: '2' })
+    expect(nav.push).not.toHaveBeenCalled()
+  })
+})
+
+describe('a card over the room', () => {
+  it('keeps the room still: no wheel, no hotbar keys, no object input', () => {
+    at('/cards/dog')
+    const { container } = render(<OS />)
+    fireEvent.wheel(window, { deltaY: 40 })
+    fireEvent.keyDown(window, { key: '1' })
+    expect(nav.push).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-room-object="laptop"]')?.closest('[inert]')).not.toBeNull()
+  })
+
+  it('returns focus to the object that opened it', () => {
+    const { rerender } = render(<OS />)
+    const dog = screen.getByRole('button', { name: 'Photo: My dog' })
+    dog.focus()
+    fireEvent.click(dog)
+    at('/cards/dog')
+    rerender(<OS />)
+    dog.blur() // the card took focus
+    expect(document.activeElement).not.toBe(dog)
+    at('/')
+    rerender(<OS />)
+    expect(document.activeElement).toBe(dog)
   })
 })
 

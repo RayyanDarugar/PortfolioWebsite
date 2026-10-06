@@ -10,7 +10,6 @@ const stub = {
   phase: 'room',
   resting: true,
   measured: true,
-  hit: null,
   scene: 'none',
   clip: 'none',
   camera: 'none',
