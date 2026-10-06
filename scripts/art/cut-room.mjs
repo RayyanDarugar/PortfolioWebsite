@@ -13,7 +13,7 @@
 // rectangular things.
 //
 // Usage: node scripts/art/cut-room.mjs
-// Writes public/room/base.png and sprites/<id>.png (sunset, the master),
+// Writes public/room/sunset.png (the master), base.png and sprites/<id>.png,
 // public/room/<variant>.png and sprites/<id>.<variant>.png (day, night), and
 // public/room/sprites.json (positions in master pixels; list order is draw order).
 
@@ -239,6 +239,8 @@ async function main() {
   }
 
   await sharp(base, { raw: { width: W, height: H, channels: 3 } }).png().toFile(`${OUT}/base.png`)
+  // The flattened room, for anything that draws the room as one picture.
+  await sharp(master, { raw: { width: W, height: H, channels: 3 } }).png().toFile(`${OUT}/sunset.png`)
   writeFileSync(`${OUT}/sprites.json`, JSON.stringify(manifest, null, 2) + '\n')
 
   // Check: base + sprites in draw order must rebuild the master exactly.

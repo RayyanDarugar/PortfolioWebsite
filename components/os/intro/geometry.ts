@@ -13,20 +13,20 @@
 export type Phase = 'room' | 'desktop'
 
 /**
- * Where the black screen rectangle sits inside `public/hero/scene-ambient.png`,
- * as fractions of the image. Measured from the file (the largest connected
- * black region), not estimated: an eyeballed value shows up at once as the
- * desktop overlapping the bezel or a black seam around it. Re-measure if the
- * picture is redrawn.
+ * Where the black screen rectangle sits inside `public/room/sunset.png`, as
+ * fractions of the image: pixels 957–1225 × 576–738 of 2688 × 1152.
+ * Measured from the file (the largest connected near-black region on the
+ * laptop), not estimated, and pinned by `__tests__/screen-art.test.ts`, which
+ * fails if the art changes without these being re-measured.
  */
-export const SCREEN_L = 0.2420
-export const SCREEN_T = 0.5547
-export const SCREEN_R = 0.4099
-export const SCREEN_B = 0.7357
+export const SCREEN_L = 957 / 2688
+export const SCREEN_T = 576 / 1152
+export const SCREEN_R = 1226 / 2688
+export const SCREEN_B = 739 / 1152
 
 /** The scene file's pixel size. The fractions above are of a rectangle. */
-export const SCENE_PX_W = 1376
-export const SCENE_PX_H = 768
+export const SCENE_PX_W = 2688
+export const SCENE_PX_H = 1152
 export const SCENE_ASPECT = SCENE_PX_W / SCENE_PX_H
 
 /** The drawn screen bitmap's pixel size: small on purpose, so it is near its

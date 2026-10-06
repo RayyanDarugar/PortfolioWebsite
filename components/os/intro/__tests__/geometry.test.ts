@@ -33,9 +33,10 @@ describe('the scene', () => {
 })
 
 describe('the screen hole', () => {
-  it('sits on the desk in the lower half at rest', () => {
+  // Low enough to stay clear of the name card in the top corner, and fully in frame.
+  it('sits on the desk, below the top of the room, at rest', () => {
     const r = hole(0, VW, VH)
-    expect(r.y).toBeGreaterThan(VH * 0.5)
+    expect(r.y).toBeGreaterThan(VH * 0.4)
     expect(r.y + r.h).toBeLessThan(VH)
   })
 
