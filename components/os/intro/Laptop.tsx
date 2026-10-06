@@ -62,9 +62,11 @@ export function Laptop({
             where the two shapes disagree. */}
         <motion.div
           className={`absolute inset-0 ${unmeasured ? 'invisible' : ''}`}
+          // Until landed the desktop is a picture in the laptop's screen, and
+          // the room underneath takes the pointer: the screen is its laptop.
           style={flying
-            ? { clipPath: zoom.clip, background: '#000' }
-            : { clipPath: 'none', background: 'transparent' }}
+            ? { clipPath: zoom.clip, background: '#000', pointerEvents: 'none' }
+            : { clipPath: 'none', background: 'transparent', pointerEvents: live ? 'auto' : 'none' }}
         >
           <motion.div
             className="absolute inset-0"

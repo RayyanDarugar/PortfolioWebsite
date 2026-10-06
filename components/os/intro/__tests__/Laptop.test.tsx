@@ -61,6 +61,16 @@ describe('Laptop', () => {
     expect(mover!.parentElement!.style.transform).toBe('')
   })
 
+  // The desktop is pasted over the laptop's screen. Until it has landed it must
+  // not take the pointer, or the screen (the room's biggest target) is dead.
+  it('lets the pointer through the screen until landed', () => {
+    const { rerender } = render(<Laptop zoom={stub} inert live={false}><p>desk</p></Laptop>)
+    const layer = screen.getByText('desk').parentElement!.parentElement!
+    expect(layer.style.pointerEvents).toBe('none')
+    rerender(<Laptop zoom={stub} inert={false} live><p>desk</p></Laptop>)
+    expect(layer.style.pointerEvents).not.toBe('none')
+  })
+
   // The room's h1 must be in the HTML whatever the URL, including /work/*.
   it('draws the room in every state, hidden once landed', () => {
     const { rerender } = render(<Laptop zoom={stub} inert live={false} room={<h1>room</h1>}><p>desk</p></Laptop>)
