@@ -54,6 +54,13 @@ describe('Laptop', () => {
     expect(play).toHaveBeenCalled()
   })
 
+  // Older browsers (and jsdom) return nothing from play() instead of a promise.
+  it('survives a play() that returns no promise', () => {
+    play.mockImplementation(() => undefined)
+    expect(() => render(<Laptop zoom={stub} inert live={false}><div /></Laptop>)).not.toThrow()
+    expect(play).toHaveBeenCalled()
+  })
+
   it('pauses once the camera starts moving, and resumes at rest', () => {
     const moving = { ...stub, resting: false } as Zoom
     const { rerender } = render(<Laptop zoom={moving} inert live={false}><div /></Laptop>)

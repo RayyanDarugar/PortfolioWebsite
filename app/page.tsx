@@ -1,3 +1,4 @@
+/** The room. Rendered by <OS /> in the root layout; see app/layout.tsx. */
 export default function Home() {
-  return <main><h1>Rayyan Darugar</h1></main>
+  return null
 }

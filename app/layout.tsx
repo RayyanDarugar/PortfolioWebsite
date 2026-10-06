@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Archivo, JetBrains_Mono, Lato } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
+import { OS } from '@/components/os/OS'
+import { PROFILE } from '@/content/profile'
 
 // Named after the typeface, not the role, so they cannot collide with the
 // role tokens in globals.css that point at them.
@@ -19,13 +21,20 @@ const pixel = localFont({
 })
 
 export const metadata: Metadata = {
-  title: { default: 'Rayyan Darugar', template: '%s · Rayyan Darugar' },
+  title: { default: PROFILE.name, template: `%s · ${PROFILE.name}` },
+  description: PROFILE.tagline,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${archivo.variable} ${lato.variable} ${mono.variable} ${pixel.variable}`}>
-      <body>{children}</body>
+      {/* The room and the laptop live here, not in a page, so they survive
+          navigation between /, /work and /work/[app] and can animate between
+          them. The pages only make those URLs real and give them titles. */}
+      <body>
+        <OS />
+        {children}
+      </body>
     </html>
   )
 }

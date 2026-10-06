@@ -35,12 +35,14 @@ export function Laptop({
   useEffect(() => {
     const el = video.current
     if (!el) return
-    if (zoom.resting) el.play().catch(() => {})
+    // play() returns a promise that rejects if the element goes away mid-call,
+    // and nothing at all in older browsers.
+    if (zoom.resting) Promise.resolve(el.play()).catch(() => {})
     else el.pause()
   }, [zoom.resting, zoom.measured, live])
 
   if (live) {
-    return <div className="absolute inset-0" inert={inert}>{children}</div>
+    return <div className="absolute inset-0" inert={inert} aria-hidden={inert}>{children}</div>
   }
 
   // The server and the first client render have no viewport. At z = 0 the room
@@ -88,7 +90,7 @@ export function Laptop({
           desktop is fitted rather than cropped and a sliver shows where the two
           shapes disagree: a lit screen with a hair of black at its edge. */}
       <motion.div className="absolute inset-0" style={{ clipPath: zoom.clip, background: '#000' }}>
-        <motion.div className="absolute inset-0" style={{ transform: zoom.camera }} inert={inert}>
+        <motion.div className="absolute inset-0" style={{ transform: zoom.camera }} inert={inert} aria-hidden={inert}>
           {children}
         </motion.div>
 
