@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Archivo, Gochi_Hand, JetBrains_Mono, Lato } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
+import { NowPlayingProvider } from '@/components/music/NowPlaying'
 import { OS } from '@/components/os/OS'
 import { PROFILE } from '@/content/profile'
 
@@ -35,8 +36,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           navigation between /, /work and /work/[app] and can animate between
           them. The pages only make those URLs real and give them titles. */}
       <body>
-        <OS />
-        {children}
+        <NowPlayingProvider>
+          <OS />
+          {children}
+        </NowPlayingProvider>
       </body>
     </html>
   )

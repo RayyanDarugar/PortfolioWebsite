@@ -27,6 +27,9 @@ body { font-family: var(--font-display); color: var(--color-ink); background: #0
   filter: drop-shadow(0 0 1px #fff7da) drop-shadow(0 0 7px rgba(255, 207, 90, .95));
 }
 
+@keyframes vinyl-spin { to { transform: rotate(360deg); } }
+.vinyl-spin { animation: vinyl-spin 1.8s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important;

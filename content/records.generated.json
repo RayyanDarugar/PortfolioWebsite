@@ -1,0 +1,65 @@
+[
+  {
+    "id": "malcolm-todd",
+    "artist": "Malcolm Todd",
+    "song": "Chest Pain (I Love)",
+    "album": "Chest Pain (I Love) - Single",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/db/62/3b/db623b7b-603a-3c32-d6f5-6f983a3d0e67/mzaf_1822567961644776851.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/chest-pain-i-love/1782985639?i=1782985658&uo=4",
+    "art": "/records/malcolm-todd.png"
+  },
+  {
+    "id": "the-strokes",
+    "artist": "The Strokes",
+    "song": "Last Nite",
+    "album": "Is This It",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/69/c7/30/69c73043-f9dd-0c63-23cd-bfab274520ee/mzaf_5834786258891852942.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/last-nite/266376953?i=266377010&uo=4",
+    "art": "/records/the-strokes.png"
+  },
+  {
+    "id": "daniel-caesar",
+    "artist": "Daniel Caesar",
+    "song": "Best Part",
+    "album": "Freudian",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/52/e4/4f/52e44f76-2397-114f-e749-ea7b9cd18a3c/mzaf_7907771188147988307.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/best-part-feat-h-e-r/1799080774?i=1799080776&uo=4",
+    "art": "/records/daniel-caesar.png"
+  },
+  {
+    "id": "kendrick-lamar",
+    "artist": "Kendrick Lamar",
+    "song": "Money Trees",
+    "album": "good kid, m.A.A.d city (Deluxe Version)",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/be/7f/2f/be7f2fe2-41dd-6b9a-4957-a10ac5c62989/mzaf_17460900856492630846.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/money-trees-feat-jay-rock/1440860389?i=1440860400&uo=4",
+    "art": "/records/kendrick-lamar.png"
+  },
+  {
+    "id": "sade",
+    "artist": "Sade",
+    "song": "No Ordinary Love",
+    "album": "Love Deluxe",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/de/ba/4b/deba4b91-edf0-1b06-6e19-ea4e07ae8070/mzaf_14195090635642668997.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/no-ordinary-love/158796559?i=158796562&uo=4",
+    "art": "/records/sade.png"
+  },
+  {
+    "id": "kanye-west",
+    "artist": "Kanye West",
+    "song": "Runaway",
+    "album": "My Beautiful Dark Twisted Fantasy",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/dc/95/bcdc957a-6823-082c-0a9b-2be3ef754972/mzaf_11124816692667140659.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/runaway-feat-pusha-t/1443160553?i=1443160699&uo=4",
+    "art": "/records/kanye-west.png"
+  },
+  {
+    "id": "marvin-gaye",
+    "artist": "Marvin Gaye",
+    "song": "What's Going On",
+    "album": "What's Going On",
+    "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/08/f3/f4/08f3f452-b24f-e25b-92bc-15850f1bdc6a/mzaf_14002930736666872327.plus.aac.p.m4a",
+    "appleMusicUrl": "https://music.apple.com/us/album/whats-going-on/1538081586?i=1538081594&uo=4",
+    "art": "/records/marvin-gaye.png"
+  }
+]
