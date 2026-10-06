@@ -9,3 +9,4 @@ next-env.d.ts
 .playwright-mcp/
 docs/mockups/masters/rejects/
 rayyan-stuff/
+docs/mockups/ui/rejects/
