@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { APP_IDS, DESKTOP, ROOM, isAppId, pathFor, viewFromPath } from '../view'
+import { APP_IDS, DESKTOP, ROOM, cardPath, isAppId, isRoomOverlay, pathFor, viewFromPath } from '../view'
 
 describe('viewFromPath', () => {
   it('reads the room, the desktop and an open app', () => {
@@ -38,5 +38,19 @@ describe('isAppId', () => {
   it('accepts only known apps', () => {
     expect(isAppId('resume')).toBe(true)
     expect(isAppId('projects')).toBe(false)
+  })
+})
+
+describe('room overlays', () => {
+  it('are the card paths and nothing else', () => {
+    expect(isRoomOverlay('/cards/dog')).toBe(true)
+    expect(isRoomOverlay('/cards/dog/')).toBe(true)
+    expect(isRoomOverlay('/cards')).toBe(false)
+    expect(isRoomOverlay('/')).toBe(false)
+    expect(isRoomOverlay('/work/resume')).toBe(false)
+  })
+
+  it('round-trip through cardPath', () => {
+    expect(isRoomOverlay(cardPath('school-usc'))).toBe(true)
   })
 })
