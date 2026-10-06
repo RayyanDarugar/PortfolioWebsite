@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #141A22;
+  --color-money: #7BE000;
+  --color-money-hi: #B6FF63;
+  --color-money-lo: #5FBE00;
+  --color-aqua: #2E7FE0;
+  --color-hue-green:  #4FB748;
+  --color-hue-yellow: #F6C300;
+  --color-hue-orange: #F0801F;
+  --color-hue-red:    #DE3B3B;
+  --color-hue-purple: #8E4A9E;
+  --color-hue-blue:   #1197D6;
+
+  /* Role tokens point at next/font's typeface variables (see layout.tsx).
+     These used to name the same variables they defined, which resolved only
+     because next/font emits unlayered CSS that beats Tailwind's layer. */
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-ui: var(--font-lato), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-hero: var(--font-instrument), system-ui, sans-serif;
+  --font-pixel: var(--font-departure), ui-monospace, monospace;
+}
+
+:root { color-scheme: light }
+body { font-family: var(--font-display); color: var(--color-ink); }
+
+.tabular { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+@keyframes dockbounce {
+  0%, 20%, 100% { transform: translateY(0); }
+  10% { transform: translateY(-15px); }
+}
+
+@keyframes bootout { to { opacity: 0; visibility: hidden } }
+@keyframes gear { to { transform: rotate(360deg) } }
+@keyframes barber { to { background-position: 34px 0 } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

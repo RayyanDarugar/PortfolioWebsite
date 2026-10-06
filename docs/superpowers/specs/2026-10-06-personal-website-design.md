@@ -101,11 +101,13 @@ Adding a book, a trip or a post means adding a file. No component changes.
 
 ### What to copy from the AE repo
 
-Source: `~/Coding Projects/AttentionExchange/site/`.
+Source: **`reference/ae-shell/`** in this repo, a frozen snapshot of AE commit `aa41566` (see its README). The original lives at `~/Coding Projects/AttentionExchange/site/`, but don't depend on it.
+
+The shell imports AE code (`profiles`, `campaign`, `slots`, `data`, `@/lib/model/*`, `@/components/shell/routes`), and the advertiser/user two-account model runs through `OS.tsx`. Phase 1 has to **untangle** this into a single desktop. Deleting files alone won't compile.
 
 - **Copy (the shell, ~3,500 lines):** `components/os/intro/` (Hero, Laptop, geometry, useIntro + tests), `OS.tsx`, `OSWindow.tsx`, `LaunchedWindow.tsx`, `Dock.tsx`, `OSMenuBar.tsx`, `Spotlight.tsx`, `Notifications.tsx`, `GhostCursor.tsx`, `Wallpaper.tsx`, `DesktopItems.tsx`, `OSButton.tsx`, `parts.tsx`, `icons.tsx`, `stage.ts`, `chrome.ts`, `useReducedMotion.ts`, `useIsoLayoutEffect.ts`, `Stacked.tsx`, and `public/fonts/` (DepartureMono, with its license).
 - **Drop:** `apps/*`, `ad*.ts(x)`, `AdSlot`, `Auction`, `campaign`, `slots`, `profiles`, `AccountMenu`, `LoginScreen`, `companions`, and the AE-specific tests. Rewrite `registry.tsx`.
-- **Watch for:** `Hero.tsx` and `OSMenuBar.tsx` mention the AE brand. `Hero.tsx` has a small **uncommitted** change in the AE working tree (as of 2026-10-06); copy the committed version unless Rayyan says otherwise.
+- **Watch for:** `Hero.tsx` and `OSMenuBar.tsx` mention the AE brand. The snapshot holds the committed `Hero.tsx`; a small uncommitted change in the AE working tree was deliberately left out.
 - **Ownership check:** some of the typography came from Landon's system ("re-typeset the hero on cofounder's system"). Ask Landon before shipping anything that came from him.
 
 ## 6. Art pipeline
