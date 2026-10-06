@@ -1,0 +1,137 @@
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  .view { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; background: #2a2018; cursor: default; }
+  .canvas { position: absolute; top: 0; left: 0; height: 100%; width: 110.9%; transform: translateX(-4.9%); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .ext { position: absolute; left: 0; top: 0; width: 21.8%; height: 100%; background: linear-gradient(90deg, #a99a80, #b6a88d 85%, #b3a58b); }
+  .ext::after { content: ""; position: absolute; left: 6%; right: 0; top: 76%; bottom: 0; background: linear-gradient(#7a4a26, #5b3519); border-top: 4px solid #96602f; }
+  .img { position: absolute; left: 21.8%; top: 0; width: 78.2%; height: 100%; background: url(scene.png) right center / 116.28% 100% no-repeat; image-rendering: pixelated; }
+  .hs { position: absolute; border: 2px dashed rgba(255,255,255,.35); border-radius: 4px; transition: all .15s; }
+  .hs:hover, .hs.lit { border: 2px solid #ffe66b; background: rgba(255,230,107,.18); box-shadow: 0 0 18px rgba(255,230,107,.55); cursor: pointer; }
+  .tip { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font: 14px 'VT323', ui-monospace, monospace; color: #fff; background: #1d1430; border: 2px solid #fff; box-shadow: 0 0 0 2px #1d1430; padding: 1px 7px; opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 5; }
+  .hs.below .tip { bottom: auto; top: calc(100% + 6px); }
+  .hs:hover .tip, .hs.lit .tip { opacity: 1; }
+  .tip small { color: #ffe66b; }
+  .plabel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 10px ui-monospace, monospace; color: rgba(255,255,255,.55); text-align: center; pointer-events: none; }
+
+  /* T1 */
+  .nav1 { position: absolute; top: 2.5%; left: 2%; right: 2%; display: flex; justify-content: space-between; align-items: center; z-index: 6; pointer-events: none; }
+  .nav1 .name, .nav1 .links { pointer-events: auto; background: rgba(20,14,10,.62); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; padding: 6px 14px; color: #fff; font: 600 12px ui-sans-serif, system-ui; }
+  .nav1 .links span { margin-left: 14px; opacity: .85; }
+  .nav1 .links span:first-child { margin-left: 0; }
+  .board-text { position: absolute; inset: 8% 6%; font-family: 'Permanent Marker', 'Comic Sans MS', cursive; color: #1f2a5a; line-height: 1.1; pointer-events: none; }
+  .board-text .h { font-size: clamp(12px, 1.9vw, 24px); }
+  .board-text .s { font-size: clamp(8px, 1vw, 13px); color: #a3262a; margin-top: 4%; }
+  .wb { background: #f3f1ea !important; border: 3px solid #8d8d8d !important; }
+  .wb:hover { box-shadow: 0 0 18px rgba(255,230,107,.7); }
+  .hint { position: absolute; bottom: 2.5%; left: 50%; transform: translateX(-50%); font: 13px 'VT323', ui-monospace, monospace; color: #fff; background: rgba(0,0,0,.45); padding: 2px 10px; border-radius: 4px; z-index: 6; white-space: nowrap; }
+
+  /* T2 */
+  .title2 { position: absolute; top: 3%; left: 2.5%; z-index: 6; background: rgba(29,20,48,.86); border: 3px solid #fff; box-shadow: 0 0 0 3px #1d1430, 6px 6px 0 rgba(0,0,0,.35); padding: 10px 14px; color: #fff; max-width: 34%; }
+  .title2 .n { font: clamp(9px, 1.15vw, 15px) 'Press Start 2P', ui-monospace, monospace; color: #ffe66b; }
+  .title2 .d { font: clamp(12px, 1.35vw, 19px) 'VT323', ui-monospace, monospace; margin-top: 6px; line-height: 1.05; }
+  .hotbar { position: absolute; bottom: 2.5%; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; z-index: 6; background: rgba(0,0,0,.55); border: 3px solid #555; padding: 3px; }
+  .slot { width: clamp(30px, 4.6vw, 54px); aspect-ratio: 1; background: #8b8b8b; border: 3px solid; border-color: #c6c6c6 #555 #555 #c6c6c6; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: clamp(13px, 1.6vw, 20px); cursor: pointer; position: relative; }
+  .slot b { font: 9px 'VT323', ui-monospace, monospace; color: #fff; text-shadow: 1px 1px 0 #000; margin-top: 1px; }
+  .slot:hover, .slot.sel { outline: 3px solid #fff; outline-offset: 0; z-index: 1; }
+  .corner2 { position: absolute; top: 3%; right: 2.5%; z-index: 6; font: 15px 'VT323', ui-monospace, monospace; color: #fff; background: rgba(29,20,48,.86); border: 2px solid #fff; padding: 2px 10px; }
+  .option .content { width: 100%; }
+  .note { font-size: 13px; opacity: .8; margin-top: 8px; }
+  .what { font-size: 13px; margin: 4px 0 10px; }
+</style>
+
+<h2>Room v2: everything in frame, with a cursor look-around</h2>
+<p class="subtitle"><b>These are live.</b> Move your mouse across each room to pan, and hover objects to see their labels. The room is now only about 10% wider than the screen, so everything is visible when the page loads, and moving the cursor reveals the last sliver at each edge. The record player, photos and surfboard came in from the left. The layout is the same in both options. They differ in how the text and nav work. The copy is placeholder.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="t1" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>The intro is written on the whiteboard, with a floating nav</h3>
+      <p class="what">Your name and pitch are written on the whiteboard in marker, next to the half-erased sketch, so the room introduces you itself. The nav is the glass capsule bar from the old AE site.</p>
+      <div class="view" data-pan>
+        <div class="canvas">
+          <div class="ext"></div><div class="img"></div>
+          <div class="hs below" style="left:2.5%;top:3%;width:56%;height:7%"><div class="tip">USC · HKUST · Bocconi <small>· where I've studied</small></div><div class="plabel">flags</div></div>
+          <div class="hs" style="left:5.5%;top:13%;width:4.5%;height:63%"><div class="tip">My board <small>· click for the story</small></div><div class="plabel">surf</div></div>
+          <div class="hs" style="left:11.5%;top:14%;width:7.5%;height:15%"><div class="tip">[dog's name]</div><div class="plabel">dog</div></div>
+          <div class="hs" style="left:11.5%;top:32%;width:7.5%;height:15%"><div class="tip">La Jolla, probably</div><div class="plabel">beach</div></div>
+          <div class="hs" style="left:10%;top:57%;width:11.5%;height:18%"><div class="tip">Record player <small>· pick a record</small></div><div class="plabel">record player</div></div>
+          <div class="hs wb" style="left:24.5%;top:12%;width:28%;height:34%">
+            <div class="board-text"><div class="h">Hi, I'm Rayyan.<br>[One line on what you build.]</div><div class="s">[the half-erased sketch goes here →]</div></div>
+            <div class="tip">Whiteboard <small>· what I'm working on</small></div>
+          </div>
+          <div class="hs" style="left:28.2%;top:54%;width:21.3%;height:29%"><div class="tip">Laptop <small>· résumé, projects, The Attention Exchange</small></div><div class="plabel">laptop</div></div>
+          <div class="hs" style="left:50.9%;top:71%;width:9%;height:8%"><div class="tip">Journal <small>· my takes</small></div><div class="plabel">journal</div></div>
+          <div class="hs" style="left:64.1%;top:1%;width:9.5%;height:75%"><div class="tip">Bookshelf <small>· 8 books I'd defend</small></div><div class="plabel">books</div></div>
+          <div class="hs" style="left:76.8%;top:56%;width:7.7%;height:25%"><div class="tip">Globe <small>· places I've been</small></div><div class="plabel">globe</div></div>
+          <div class="hs" style="left:85.5%;top:1%;width:14%;height:71%"><div class="tip">San Diego, right now</div><div class="plabel">window</div></div>
+        </div>
+        <div class="nav1"><div class="name">Rayyan Darugar</div><div class="links"><span>Résumé</span><span>Projects</span><span>Journal</span><span>Contact</span></div></div>
+        <div class="hint">move to look around · click anything</div>
+      </div>
+      <p class="note">+ The most "this is my room": the intro is part of the art instead of laid over it, and the nav is instantly familiar to a recruiter. − The text is only as big as the whiteboard, so the pitch has to be short.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="t2" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>A game title card, with the nav as a Minecraft hotbar</h3>
+      <p class="what">The intro sits in a pixel dialog box in the corner. The nav is a hotbar where every slot is an object in the room. <b>Hover a slot and that object lights up</b>, so the hotbar works as nav, legend and keyboard access all at once.</p>
+      <div class="view" data-pan>
+        <div class="canvas">
+          <div class="ext"></div><div class="img"></div>
+          <div class="hs below" data-k="flags" style="left:2.5%;top:3%;width:56%;height:7%"><div class="tip">USC · HKUST · Bocconi</div><div class="plabel">flags</div></div>
+          <div class="hs" data-k="surf" style="left:5.5%;top:13%;width:4.5%;height:63%"><div class="tip">My board</div><div class="plabel">surf</div></div>
+          <div class="hs" data-k="photos" style="left:11.5%;top:14%;width:7.5%;height:15%"><div class="tip">[dog's name]</div><div class="plabel">dog</div></div>
+          <div class="hs" data-k="photos" style="left:11.5%;top:32%;width:7.5%;height:15%"><div class="tip">La Jolla</div><div class="plabel">beach</div></div>
+          <div class="hs" data-k="music" style="left:10%;top:57%;width:11.5%;height:18%"><div class="tip">Record player</div><div class="plabel">record player</div></div>
+          <div class="hs" data-k="board" style="left:24.5%;top:12%;width:28%;height:34%"><div class="tip">Whiteboard</div><div class="plabel">whiteboard (half-erased sketch)</div></div>
+          <div class="hs" data-k="laptop" style="left:28.2%;top:54%;width:21.3%;height:29%"><div class="tip">Laptop <small>· résumé, projects</small></div><div class="plabel">laptop</div></div>
+          <div class="hs" data-k="journal" style="left:50.9%;top:71%;width:9%;height:8%"><div class="tip">Journal</div><div class="plabel">journal</div></div>
+          <div class="hs" data-k="books" style="left:64.1%;top:1%;width:9.5%;height:75%"><div class="tip">Bookshelf</div><div class="plabel">books</div></div>
+          <div class="hs" data-k="globe" style="left:76.8%;top:56%;width:7.7%;height:25%"><div class="tip">Globe</div><div class="plabel">globe</div></div>
+          <div class="hs" data-k="window" style="left:85.5%;top:1%;width:14%;height:71%"><div class="tip">San Diego, right now</div><div class="plabel">window</div></div>
+        </div>
+        <div class="title2"><div class="n">RAYYAN DARUGAR</div><div class="d">[Founder of The Attention Exchange. USC. One line of personality.]</div></div>
+        <div class="corner2">Résumé ↓</div>
+        <div class="hotbar">
+          <div class="slot" data-t="laptop">💻<b>work</b></div>
+          <div class="slot" data-t="journal">📓<b>journal</b></div>
+          <div class="slot" data-t="music">💿<b>music</b></div>
+          <div class="slot" data-t="books">📚<b>books</b></div>
+          <div class="slot" data-t="globe">🌐<b>travel</b></div>
+          <div class="slot" data-t="board">🖊️<b>building</b></div>
+          <div class="slot" data-t="flags">🚩<b>schools</b></div>
+          <div class="slot" data-t="surf">🏄<b>surf</b></div>
+          <div class="slot" data-t="photos">🖼️<b>photos</b></div>
+        </div>
+      </div>
+      <p class="note">+ Every object has a visible label even if nobody hovers, the gaming nod matches the journal and the cards, and the hotbar folds neatly into a bottom bar on phones. − Leans harder into "game." A recruiter needs one more second to find Résumé (hence the corner link).</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('[data-pan]').forEach(function (view) {
+    var canvas = view.querySelector('.canvas');
+    view.addEventListener('mousemove', function (e) {
+      var r = view.getBoundingClientRect();
+      var t = (e.clientX - r.left) / r.width;           // 0..1
+      var shift = -(0.109 / 1.109) * 100 * t;            // canvas is 10.9% wider than the view
+      canvas.style.transform = 'translateX(' + shift + '%)';
+    });
+    view.addEventListener('mouseleave', function () { canvas.style.transform = 'translateX(-4.9%)'; });
+    view.addEventListener('click', function (e) { e.stopPropagation(); });
+    view.querySelectorAll('.slot').forEach(function (slot) {
+      slot.addEventListener('mouseenter', function () {
+        view.querySelectorAll('.hs[data-k="' + slot.dataset.t + '"]').forEach(function (h) { h.classList.add('lit'); });
+      });
+      slot.addEventListener('mouseleave', function () {
+        view.querySelectorAll('.hs.lit').forEach(function (h) { h.classList.remove('lit'); });
+      });
+    });
+  });
+</script>
