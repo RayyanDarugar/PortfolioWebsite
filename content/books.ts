@@ -44,14 +44,4 @@ export function getBook(slug: string): Book | undefined {
   return getBooks().find((b) => b.slug === slug)
 }
 
-/** Splits a review into pages of about `budget` characters, never inside a paragraph. */
-export function reviewPages(review: string[], budget = 520): string[][] {
-  const pages: string[][] = [[]]
-  let used = 0
-  for (const p of review) {
-    if (used > 0 && used + p.length > budget) { pages.push([]); used = 0 }
-    pages[pages.length - 1].push(p)
-    used += p.length
-  }
-  return pages
-}
+export { reviewPages } from './reviewPages'

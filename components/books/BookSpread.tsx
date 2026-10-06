@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import type { Book } from '@/content/books'
-import { reviewPages } from '@/content/books'
+import { reviewPages } from '@/content/reviewPages'
 
 /** The spread's two pages, px of public/ui/book-spread.png (1400 × 906), measured from the file. */
 const LEFT = [102, 30, 667, 719] as const
