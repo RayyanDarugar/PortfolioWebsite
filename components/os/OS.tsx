@@ -12,7 +12,7 @@ import { Stacked } from './Stacked'
 import { Wallpaper } from './Wallpaper'
 import type { Box } from './chrome'
 import { Laptop } from './intro/Laptop'
-import { isDownwardWheel } from './intro/geometry'
+import { isDownwardWheel, isUpwardWheel } from './intro/geometry'
 import { useZoom } from './intro/useZoom'
 import { APPS, appIndex } from './registry'
 import { useIsoLayoutEffect } from './useIsoLayoutEffect'
@@ -100,19 +100,29 @@ export function OS() {
     return () => window.removeEventListener('keydown', onKey)
   }, [mode, view.app, view.zoomed, landed, pathname, spotlight, closeSpotlight, go])
 
-  // Scrolling down in the room is a shortcut into the laptop. A trackpad flick
-  // is dozens of wheel events, so this fires once per visit to the room.
+  // Scrolling is a shortcut both ways: down in the room goes into the laptop,
+  // up on the landed desktop comes back out. A trackpad flick is dozens of
+  // wheel events, so each direction fires once per visit.
   useEffect(() => {
-    if (mode !== 'os' || view.zoomed) return
+    if (mode !== 'os') return
     let fired = false
     const onWheel = (event: WheelEvent) => {
-      if (fired || !isDownwardWheel(event.deltaY)) return
+      if (fired) return
+      if (!view.zoomed) {
+        if (!isDownwardWheel(event.deltaY)) return
+        fired = true
+        openLaptop()
+        return
+      }
+      if (!landed || !isUpwardWheel(event.deltaY)) return
+      // Inside an open window the wheel scrolls the window, not the camera.
+      if (event.target instanceof Element && event.target.closest('[data-os-window]')) return
       fired = true
-      openLaptop()
+      go(pathFor(ROOM))
     }
     window.addEventListener('wheel', onWheel, { passive: true })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [mode, view.zoomed, openLaptop])
+  }, [mode, view.zoomed, landed, openLaptop, go])
 
   // Dock tiles are the windows' launch origins. Measured only once landed: inside
   // the zoom's transform every rect would be off by the camera's scale.

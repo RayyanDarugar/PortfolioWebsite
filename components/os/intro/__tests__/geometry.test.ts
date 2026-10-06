@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  SCENE_ASPECT, SCREEN_L, SCREEN_T, camera, clip, hole, isDownwardWheel,
+  SCENE_ASPECT, SCREEN_L, SCREEN_T, camera, clip, hole, isDownwardWheel, isUpwardWheel,
   pixelFade, roomUiFade, scene, window01,
 } from '../geometry'
 
@@ -107,5 +107,11 @@ describe('isDownwardWheel', () => {
     expect(isDownwardWheel(4)).toBe(true)
     expect(isDownwardWheel(1)).toBe(false)
     expect(isDownwardWheel(-40)).toBe(false)
+  })
+
+  it('reads upward scrolls the same way', () => {
+    expect(isUpwardWheel(-4)).toBe(true)
+    expect(isUpwardWheel(-1)).toBe(false)
+    expect(isUpwardWheel(40)).toBe(false)
   })
 })

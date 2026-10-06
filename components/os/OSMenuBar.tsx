@@ -84,6 +84,19 @@ export function OSMenuBar({
       </div>
 
       <div className="flex flex-none items-stretch gap-[2px] pr-[10px]">
+        {/* The visible way out. Esc and scrolling up do the same thing. */}
+        <Link
+          href={pathFor({ zoomed: false, app: null })}
+          scroll={false}
+          title="Back to the room — Esc"
+          className="flex flex-none items-center gap-[6px] whitespace-nowrap rounded-[4px] px-[9px] text-white/85 hover:bg-white/15 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
+        >
+          <svg aria-hidden viewBox="0 0 16 16" className="h-[13px] w-[13px]" fill="none"
+               stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 2.5v6M4.6 4.6a5 5 0 1 0 6.8 0" />
+          </svg>
+          Leave laptop
+        </Link>
         {onOpenSpotlight && (
           <button
             type="button"

@@ -15,6 +15,15 @@ describe('OSMenuBar', () => {
   })
 })
 
+describe('OSMenuBar exit', () => {
+  it('has a visible way out of the laptop', () => {
+    render(<OSMenuBar appName="Finder" apps={APPS} />)
+    const leave = screen.getByRole('link', { name: 'Leave laptop' })
+    expect(leave.getAttribute('href')).toBe('/')
+    expect(leave.textContent).toContain('Leave laptop')
+  })
+})
+
 describe('Dock', () => {
   it('selects a tile by index and marks the open app', () => {
     const onSelect = vi.fn()

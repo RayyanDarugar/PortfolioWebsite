@@ -124,3 +124,7 @@ export const WHEEL_FLOOR = 2
 export function isDownwardWheel(deltaY: number): boolean {
   return deltaY > WHEEL_FLOOR
 }
+
+export function isUpwardWheel(deltaY: number): boolean {
+  return deltaY < -WHEEL_FLOOR
+}

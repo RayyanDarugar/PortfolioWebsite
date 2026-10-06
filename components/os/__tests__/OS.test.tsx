@@ -125,6 +125,31 @@ describe('the laptop', () => {
   })
 })
 
+describe('getting back out of the laptop', () => {
+  it('scrolling up on the desktop zooms out, once per flick', () => {
+    at('/work')
+    render(<OS />)
+    for (let i = 0; i < 5; i += 1) fireEvent.wheel(window, { deltaY: -40 })
+    expect(nav.push).toHaveBeenCalledTimes(1)
+    expect(nav.push).toHaveBeenCalledWith('/', PUSH_OPTS)
+  })
+
+  it('scrolling down on the desktop does nothing', () => {
+    at('/work')
+    render(<OS />)
+    fireEvent.wheel(window, { deltaY: 40 })
+    expect(nav.push).not.toHaveBeenCalled()
+  })
+
+  // A long résumé scrolls inside its window; that must not leave the laptop.
+  it('scrolling up inside an open window scrolls the window, not the camera', () => {
+    at('/work/resume')
+    render(<OS />)
+    fireEvent.wheel(screen.getByText('University of Southern California'), { deltaY: -40 })
+    expect(nav.push).not.toHaveBeenCalled()
+  })
+})
+
 describe('Esc while something else is in flight', () => {
   // Clicking the panel's padding moves focus to <body>, so Esc never reaches
   // Spotlight's own handler.

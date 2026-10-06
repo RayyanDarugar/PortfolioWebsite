@@ -156,6 +156,7 @@ export function LaunchedWindow({
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-[clamp(16px,2.6vw,52px)] pb-[112px] pt-[56px]">
       <motion.div
         ref={ref}
+        data-os-window
         className={`flex w-full flex-col ${active ? 'pointer-events-auto' : ''}`}
         // The chrome variables ride on the wrapper rather than being drilled
         // through seven app components: the launcher is the one place that
