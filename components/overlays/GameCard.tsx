@@ -79,7 +79,7 @@ export function GameCard({ card, prev, next }: { card: CardView; prev: string | 
         >
           {card.title}
         </h2>
-        <div className="absolute overflow-hidden px-[5cqw] py-[3.4cqw]" style={place(FRAME.text)}>
+        <div className="absolute overflow-y-auto px-[5cqw] py-[3.4cqw]" style={place(FRAME.text)}>
           <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '2.8cqw', letterSpacing: '.12em', color: '#8a5a2b' }}>
             {card.tag}
           </p>
