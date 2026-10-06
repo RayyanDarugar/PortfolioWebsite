@@ -41,6 +41,17 @@ describe('the room', () => {
     expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
   })
 
+  // It is hidden from assistive tech (the named button is the same action), so
+  // it must never take focus: a focused aria-hidden element is a dead end.
+  it('the laptop hit area opens the laptop and cannot take focus', () => {
+    render(<OS />)
+    const hit = document.querySelector<HTMLElement>('[title="Open the laptop"]')!
+    hit.focus()
+    expect(document.activeElement).not.toBe(hit)
+    fireEvent.click(hit)
+    expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
+  })
+
   it('a burst of wheel events navigates once', () => {
     render(<OS />)
     for (let i = 0; i < 5; i += 1) fireEvent.wheel(window, { deltaY: 40 })

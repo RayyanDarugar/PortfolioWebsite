@@ -56,10 +56,10 @@ export function RoomChrome({
       </div>
 
       {zoom.hit && (
-        <button
-          type="button"
+        // A div, not a button: it is hidden from assistive tech, so it must
+        // never be able to take focus. The named button above is the same action.
+        <div
           aria-hidden
-          tabIndex={-1}
           title="Open the laptop"
           onClick={onOpenLaptop}
           className="pointer-events-auto absolute cursor-pointer rounded-[3px] outline-2 outline-offset-4 outline-[#FFD36E] hover:outline"
