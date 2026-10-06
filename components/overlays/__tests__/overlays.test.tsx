@@ -5,19 +5,21 @@ import { renderToString } from 'react-dom/server'
 const nav = vi.hoisted(() => {
   const push = vi.fn()
   const replace = vi.fn()
-  return { push, replace, router: { push, replace, back: () => {}, prefetch: () => {} } }
+  const back = vi.fn()
+  return { push, replace, back, router: { push, replace, back, prefetch: () => {} } }
 })
 vi.mock('next/navigation', () => ({ useRouter: () => nav.router, usePathname: () => '/cards/x' }))
 
 import { GameCard, type CardView } from '../GameCard'
 import { Overlay } from '../Overlay'
+import { markOverlayOpenedInApp } from '../history'
 
 const card: CardView = {
   id: 'school-hkust', tag: 'SCHOOL · HKUST · 2025', title: 'HKUST', photo: '/room/sprites/flags.png',
   stat: 'GPA 3.96', body: ['The second stop.', 'Hong Kong.'],
 }
 
-beforeEach(() => { nav.push.mockClear(); nav.replace.mockClear() })
+beforeEach(() => { nav.push.mockClear(); nav.replace.mockClear(); nav.back.mockClear() })
 
 describe('Overlay', () => {
   it('closes to the room on Esc and on a click outside', () => {
@@ -26,6 +28,23 @@ describe('Overlay', () => {
     expect(nav.push).toHaveBeenLastCalledWith('/', { scroll: false })
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(nav.push).toHaveBeenCalledTimes(2)
+  })
+
+  // Closing a card opened from the room goes back, so Back afterwards leaves
+  // the room instead of reopening the card; a pasted link closes to the room.
+  it('goes back when the card was opened from inside the site', () => {
+    markOverlayOpenedInApp()
+    render(<Overlay label="HKUST"><p>card</p></Overlay>)
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(nav.back).toHaveBeenCalledOnce()
+    expect(nav.push).not.toHaveBeenCalled()
+  })
+
+  it('closes to the room when the card was opened from a link', () => {
+    render(<Overlay label="HKUST"><p>card</p></Overlay>)
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(nav.back).not.toHaveBeenCalled()
+    expect(nav.push).toHaveBeenCalledWith('/', { scroll: false })
   })
 
   it('takes focus and names itself', () => {

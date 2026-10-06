@@ -3,6 +3,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { PROFILE } from '@/content/profile'
 import { HOTBAR } from '@/content/room'
+import { consumeOpenedInApp } from '@/components/overlays/history'
 
 const nav = vi.hoisted(() => {
   const push = vi.fn()
@@ -42,10 +43,12 @@ describe('the room', () => {
     expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
   })
 
-  it('opens a game card from an object', () => {
+  it('opens a game card from an object, marked as opened in the site', () => {
+    consumeOpenedInApp()
     render(<OS />)
     fireEvent.click(screen.getByRole('button', { name: 'Photo: My dog' }))
     expect(nav.push).toHaveBeenCalledWith('/cards/dog', PUSH_OPTS)
+    expect(consumeOpenedInApp()).toBe(true)
   })
 
   it('has hotbar slots that act exactly like their objects', () => {
@@ -104,6 +107,17 @@ describe('the room', () => {
     at('/work/nope')
     render(<OS />)
     expect(screen.getByRole('button', { name: /^Laptop:/ })).toBeTruthy()
+  })
+
+  // Leaving the laptop flies the camera out for about a second; a scroll during
+  // that flight must not throw it straight back in.
+  it('ignores the wheel while the camera is still flying out', () => {
+    at('/work')
+    const { rerender } = render(<OS />)
+    at('/')
+    rerender(<OS />)
+    fireEvent.wheel(window, { deltaY: 40 })
+    expect(nav.push).not.toHaveBeenCalled()
   })
 
   it('hotbar keys do nothing on the desktop', () => {

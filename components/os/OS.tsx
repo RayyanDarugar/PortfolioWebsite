@@ -2,6 +2,7 @@
 import { MotionConfig, motion, useMotionValue, useSpring } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { markOverlayOpenedInApp } from '@/components/overlays/history'
 import { Hotbar } from '@/components/room/Hotbar'
 import { RoomBackdrop } from '@/components/room/RoomBackdrop'
 import { RoomBar } from '@/components/room/RoomBar'
@@ -97,7 +98,10 @@ export function OS() {
     if (!object) return
     opener.current = id
     if (object.action.kind === 'zoom') openLaptop()
-    else go(cardPath(object.action.card))
+    else {
+      markOverlayOpenedInApp()
+      go(cardPath(object.action.card))
+    }
   }, [openLaptop, go])
   const activateSlot = useCallback((slot: HotbarSlot) => activate(slot.objects[0]), [activate])
 
@@ -150,7 +154,9 @@ export function OS() {
     const onWheel = (event: WheelEvent) => {
       if (fired) return
       if (!view.zoomed) {
-        if (!isDownwardWheel(event.deltaY)) return
+        // Not until the camera is back at rest: a scroll during the flight
+        // out would throw it straight back in.
+        if (!zoom.resting || !isDownwardWheel(event.deltaY)) return
         fired = true
         openLaptop()
         return
@@ -163,7 +169,7 @@ export function OS() {
     }
     window.addEventListener('wheel', onWheel, { passive: true })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [mode, overlayOpen, view.zoomed, landed, openLaptop, go])
+  }, [mode, overlayOpen, view.zoomed, landed, zoom.resting, openLaptop, go])
 
   // The pan follows the pointer across the whole window while the room is in
   // view, and returns to rest when the pointer leaves the page.

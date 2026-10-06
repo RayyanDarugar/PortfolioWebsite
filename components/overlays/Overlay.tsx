@@ -2,6 +2,7 @@
 import { MotionConfig, motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, type ReactNode } from 'react'
+import { consumeOpenedInApp } from './history'
 
 const FOCUSABLE = 'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
@@ -9,14 +10,19 @@ const FOCUSABLE = 'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"]
  * The overlay host (spec §4, §5): a modal over the room. Every overlay is a
  * route whose page renders one of these, so it is server-rendered and has its
  * own URL; the room stays mounted underneath in the root layout. It closes
- * with Esc, a click outside, or the back button (which is just navigation),
+ * with Esc, a click outside, or the back button (which is just navigation);
+ * closing one opened from inside the site goes back rather than forward,
  * and keeps keyboard focus inside while open. The OS root returns focus to
  * the object that opened it.
  */
 export function Overlay({ label, children }: { label: string; children: ReactNode }) {
   const router = useRouter()
   const dialog = useRef<HTMLDivElement>(null)
-  const close = useCallback(() => router.push('/', { scroll: false }), [router])
+  // Back when opened from inside the site, so Back afterwards does not reopen it.
+  const close = useCallback(() => {
+    if (consumeOpenedInApp()) router.back()
+    else router.push('/', { scroll: false })
+  }, [router])
 
   useEffect(() => { dialog.current?.focus() }, [])
 
