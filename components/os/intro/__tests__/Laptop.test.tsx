@@ -49,6 +49,18 @@ describe('Laptop', () => {
     expect(mounts).toBe(1)
   })
 
+  // The pan must move the room inside a still clipping window. Panning the
+  // clipping layer itself slides the window along and opens a gap at the edge.
+  it('pans inside a clip that stays put', () => {
+    const panned = { ...stub, roomX: 40 } as unknown as Zoom
+    const { container } = render(<Laptop zoom={panned} inert live={false}><p>desk</p></Laptop>)
+    const mover = [...container.querySelectorAll<HTMLElement>('*')].find((el) => el.style.transform.includes('translateX(40px)'))
+    expect(mover).toBeTruthy()
+    expect(mover!.classList.contains('overflow-hidden')).toBe(false)
+    expect(mover!.parentElement!.classList.contains('overflow-hidden')).toBe(true)
+    expect(mover!.parentElement!.style.transform).toBe('')
+  })
+
   // The room's h1 must be in the HTML whatever the URL, including /work/*.
   it('draws the room in every state, hidden once landed', () => {
     const { rerender } = render(<Laptop zoom={stub} inert live={false} room={<h1>room</h1>}><p>desk</p></Laptop>)

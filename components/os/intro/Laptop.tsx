@@ -41,49 +41,53 @@ export function Laptop({
   const hidden = live ? 'hidden' : 'visible'
 
   return (
-    <motion.div className="absolute inset-0 overflow-hidden" style={{ x: zoom.roomX }}>
-      <motion.div
-        className="absolute"
-        style={zoom.measured
-          ? {
-            left: 0, top: 0, width: zoom.sceneBox.width, height: zoom.sceneBox.height,
-            transform: zoom.scene, transformOrigin: '0 0', visibility: hidden,
-          }
-          : { ...restCss(), visibility: hidden }}
-      >
-        {room}
-      </motion.div>
-
-      {/* The desktop, cut to the drawn screen while flying. Black behind it,
-          because the desktop is fitted rather than cropped and a sliver shows
-          where the two shapes disagree. */}
-      <motion.div
-        className={`absolute inset-0 ${unmeasured ? 'invisible' : ''}`}
-        style={flying
-          ? { clipPath: zoom.clip, background: '#000' }
-          : { clipPath: 'none', background: 'transparent' }}
-      >
+    // The clip stays put and the layer inside it pans: panning the clipping
+    // layer itself would slide the window along and open a gap at the edge.
+    <div className="absolute inset-0 overflow-hidden">
+      <motion.div className="absolute inset-0" style={{ x: zoom.roomX }}>
         <motion.div
-          className="absolute inset-0"
-          style={{ transform: flying ? zoom.camera : 'none' }}
-          inert={inert}
-          aria-hidden={inert}
+          className="absolute"
+          style={zoom.measured
+            ? {
+              left: 0, top: 0, width: zoom.sceneBox.width, height: zoom.sceneBox.height,
+              transform: zoom.scene, transformOrigin: '0 0', visibility: hidden,
+            }
+            : { ...restCss(), visibility: hidden }}
         >
-          {children}
+          {room}
         </motion.div>
 
-        {flying && (
-          <motion.img
-            aria-hidden
-            src={SCREEN_PIXEL_SRC}
-            alt=""
-            width={PIXEL_SCREEN_W}
-            height={PIXEL_SCREEN_H}
-            className="pointer-events-none absolute left-0 top-0 max-w-none"
-            style={{ transform: zoom.pixelScreen, transformOrigin: '0 0', opacity: zoom.pixelOpacity, ...PIXELATED }}
-          />
-        )}
+        {/* The desktop, cut to the drawn screen while flying. Black behind it,
+            because the desktop is fitted rather than cropped and a sliver shows
+            where the two shapes disagree. */}
+        <motion.div
+          className={`absolute inset-0 ${unmeasured ? 'invisible' : ''}`}
+          style={flying
+            ? { clipPath: zoom.clip, background: '#000' }
+            : { clipPath: 'none', background: 'transparent' }}
+        >
+          <motion.div
+            className="absolute inset-0"
+            style={{ transform: flying ? zoom.camera : 'none' }}
+            inert={inert}
+            aria-hidden={inert}
+          >
+            {children}
+          </motion.div>
+
+          {flying && (
+            <motion.img
+              aria-hidden
+              src={SCREEN_PIXEL_SRC}
+              alt=""
+              width={PIXEL_SCREEN_W}
+              height={PIXEL_SCREEN_H}
+              className="pointer-events-none absolute left-0 top-0 max-w-none"
+              style={{ transform: zoom.pixelScreen, transformOrigin: '0 0', opacity: zoom.pixelOpacity, ...PIXELATED }}
+            />
+          )}
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
