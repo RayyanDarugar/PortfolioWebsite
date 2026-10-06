@@ -15,7 +15,7 @@ const PIXEL_TEXT = { fontFamily: 'var(--font-pixel)' }
  * closes.
  */
 export function RecordCrate({ records }: { records: readonly Track[] }) {
-  const { current, playing, play } = useNowPlaying()
+  const { current, playing, failed, play, toggle } = useNowPlaying()
   const mid = (records.length - 1) / 2
 
   return (
@@ -35,9 +35,16 @@ export function RecordCrate({ records }: { records: readonly Track[] }) {
               <p className="text-[11px] uppercase tracking-[.16em] text-[#d9b98a]">On the platter</p>
               <p className="mt-[4px] text-[15px]">{current.song}</p>
               <p className="text-[12px] text-[#d9b98a]">{current.artist} · {current.album}</p>
-              <a href={current.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="mt-[6px] inline-block text-[11px] underline-offset-2 hover:underline">
-                Listen on Apple Music
-              </a>
+              {failed && <p className="mt-[4px] text-[11px] text-[#ffb08a]">Preview unavailable</p>}
+              <div className="mt-[6px] flex items-center gap-[12px]">
+                {/* Pause lives here too: the corner chip is under this overlay's backdrop. */}
+                <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'} className="rounded-[6px] border border-[rgba(255,214,140,.3)] px-[8px] py-[2px] text-[12px] hover:bg-white/10">
+                  {playing ? '❚❚' : '▶'}
+                </button>
+                <a href={current.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] underline-offset-2 hover:underline">
+                  Listen on Apple Music
+                </a>
+              </div>
             </>
           ) : (
             <p className="text-[12px] text-[#d9b98a]">Pick a record to put it on.</p>

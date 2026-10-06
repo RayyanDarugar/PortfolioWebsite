@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { CSSProperties, ReactNode } from 'react'
-import { consumeOpenedInApp } from './history'
+import { consumeOpenedInApp, opensElsewhere } from './history'
 
 /**
  * A link up one overlay level (entry → contents). Reached inside the site, it
@@ -16,7 +16,7 @@ export function BackLink({
   return (
     <Link href={href} replace scroll={false} className={className} style={style}
           onClick={(event) => {
-            if (!consumeOpenedInApp()) return
+            if (opensElsewhere(event) || !consumeOpenedInApp()) return
             event.preventDefault()
             router.back()
           }}>

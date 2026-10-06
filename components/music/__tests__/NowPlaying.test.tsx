@@ -56,3 +56,25 @@ describe('NowPlaying', () => {
     expect(screen.queryByRole('region', { name: 'Now playing' })).toBeNull()
   })
 })
+
+// The <audio> element is the truth: media keys, the OS or a headphone unplug
+// pause it without the site's buttons, and a dead preview URL never plays.
+describe('NowPlaying follows the audio element', () => {
+  it('shows Play when something else paused it', async () => {
+    const { container } = render(<NowPlayingProvider><Picker /></NowPlayingProvider>)
+    await act(async () => { fireEvent.click(screen.getByText('first')) })
+    const audio = container.querySelector('audio')!
+    act(() => { audio.dispatchEvent(new Event('play')) })
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeTruthy()
+    act(() => { audio.dispatchEvent(new Event('pause')) })
+    expect(screen.getByRole('button', { name: 'Play' })).toBeTruthy()
+  })
+
+  it('says so when the preview will not load', async () => {
+    const { container } = render(<NowPlayingProvider><Picker /></NowPlayingProvider>)
+    await act(async () => { fireEvent.click(screen.getByText('first')) })
+    act(() => { container.querySelector('audio')!.dispatchEvent(new Event('error')) })
+    expect(screen.getByRole('region', { name: 'Now playing' }).textContent).toContain('Preview unavailable')
+  })
+})
+

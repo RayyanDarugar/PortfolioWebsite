@@ -18,3 +18,21 @@ describe('overlay history', () => {
     expect(consumeOpenedInApp()).toBe(false)
   })
 })
+
+// A cold /books, then a book, then the browser's own Back: the step was undone
+// outside the site, so Esc on the shelf must not go back again (off the site).
+describe('the browser Back button', () => {
+  it('undoes a step the site counted', () => {
+    markOverlayOpenedInApp()
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    expect(consumeOpenedInApp()).toBe(false)
+  })
+
+  it('is not counted twice when the site itself went back', () => {
+    markOverlayOpenedInApp() // room → shelf
+    markOverlayOpenedInApp() // shelf → book
+    expect(consumeOpenedInApp()).toBe(true) // Esc: book → shelf, by router.back()
+    window.dispatchEvent(new PopStateEvent('popstate')) // that back landing
+    expect(consumeOpenedInApp()).toBe(true) // Esc: shelf → room is still a back
+  })
+})

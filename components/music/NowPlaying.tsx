@@ -6,6 +6,8 @@ import type { Track } from '@/content/records'
 interface NowPlaying {
   current: Track | null
   playing: boolean
+  /** The preview would not load (an expired or missing URL). */
+  failed: boolean
   play: (record: Track) => void
   toggle: () => void
   stop: () => void
@@ -28,12 +30,14 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const audio = useRef<HTMLAudioElement>(null)
   const [current, setCurrent] = useState<Track | null>(null)
   const [playing, setPlaying] = useState(false)
+  const [failed, setFailed] = useState(false)
 
   const play = useCallback((record: Track) => {
     const el = audio.current
     if (!el) return
     if (el.getAttribute('src') !== record.previewUrl) el.src = record.previewUrl
     setCurrent(record)
+    setFailed(false)
     Promise.resolve(el.play()).then(() => setPlaying(true)).catch(() => setPlaying(false))
   }, [])
 
@@ -50,12 +54,18 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
     setCurrent(null)
   }, [])
 
-  const value = useMemo(() => ({ current, playing, play, toggle, stop }), [current, playing, play, toggle, stop])
+  const value = useMemo(() => ({ current, playing, failed, play, toggle, stop }), [current, playing, failed, play, toggle, stop])
 
   return (
     <Ctx.Provider value={value}>
       {children}
-      <audio ref={audio} preload="none" onEnded={() => setPlaying(false)} />
+      {/* The element is the truth: media keys, the OS or another tab can
+          pause it without going through these buttons. */}
+      <audio ref={audio} preload="none"
+             onPlay={() => setPlaying(true)}
+             onPause={() => setPlaying(false)}
+             onEnded={() => setPlaying(false)}
+             onError={() => { setPlaying(false); setFailed(true) }} />
       {current && (
         <section
           aria-label="Now playing"
@@ -64,7 +74,7 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
         >
           <Image src={current.art} alt="" width={40} height={40} className={playing ? 'vinyl-spin rounded-full' : 'rounded-full'} style={{ imageRendering: 'pixelated' }} />
           <span className="min-w-0">
-            <span className="block text-[10px] uppercase tracking-[.16em] text-[#d9b98a]">Now playing</span>
+            <span className="block text-[10px] uppercase tracking-[.16em] text-[#d9b98a]">{failed ? 'Preview unavailable' : 'Now playing'}</span>
             <span className="block max-w-[220px] truncate text-[12px]">{current.song} · {current.artist}</span>
             <a href={current.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] underline-offset-2 hover:underline">
               Listen on Apple Music
