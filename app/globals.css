@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@source not "../reference";
+
+@theme inline {
+  --color-ink: #141A22;
+  --color-money: #7BE000;
+  --color-money-hi: #B6FF63;
+  --color-money-lo: #5FBE00;
+  --color-aqua: #2E7FE0;
+
+  /* Role tokens point at next/font's typeface variables (see layout.tsx). */
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-ui: var(--font-lato), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-pixel: var(--font-departure), ui-monospace, monospace;
+}
+
+:root { color-scheme: light }
+body { font-family: var(--font-display); color: var(--color-ink); background: #000; }
+
+.tabular { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
