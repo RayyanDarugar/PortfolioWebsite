@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }), usePathname: () => '/places' }))
 import { projectPin } from '../project'
 import { Globe } from '../Globe'
@@ -25,5 +25,19 @@ describe('Globe', () => {
     ]} />)
     expect(screen.getByRole('link', { name: 'San Diego' }).getAttribute('href')).toBe('/places/san-diego')
     expect(screen.queryByRole('link', { name: 'Hong Kong' })).toBeNull()
+  })
+})
+
+// Pressing a pin used to start a drag, and the drag's pointer capture moved
+// the click off the link: pins never opened anything with a mouse.
+describe('pressing a pin', () => {
+  it('leaves the click to the pin instead of starting a drag', () => {
+    const capture = vi.fn()
+    HTMLElement.prototype.setPointerCapture = capture
+    const { container } = render(<Globe places={[{ slug: 'san-diego', name: 'San Diego', lat: 32.7, lon: -117.2 }]} />)
+    fireEvent.pointerDown(screen.getByRole('link', { name: 'San Diego' }), { pointerId: 1 })
+    expect(capture).not.toHaveBeenCalled()
+    fireEvent.pointerDown(container.querySelector('canvas')!, { pointerId: 1 })
+    expect(capture).toHaveBeenCalledTimes(1)
   })
 })

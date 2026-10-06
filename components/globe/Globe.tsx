@@ -57,7 +57,13 @@ export function Globe({ places }: { places: readonly { slug: string; name: strin
       <h2 className="text-[14px] uppercase tracking-[.24em]" style={{ fontFamily: 'var(--font-pixel)' }}>Places I&apos;ve been</h2>
       <div
         className="relative h-[min(480px,80vw)] w-[min(480px,80vw)] cursor-grab touch-none active:cursor-grabbing"
-        onPointerDown={(e) => { drag.current = { x: e.clientX, y: e.clientY, r: rotate }; e.currentTarget.setPointerCapture(e.pointerId) }}
+        onPointerDown={(e) => {
+          // A press on a pin is a click on its link: capturing the pointer for
+          // a drag would retarget the click to this layer and the pin would go dead.
+          if ((e.target as Element).closest('a')) return
+          drag.current = { x: e.clientX, y: e.clientY, r: rotate }
+          e.currentTarget.setPointerCapture(e.pointerId)
+        }}
         onPointerMove={(e) => {
           const d = drag.current
           if (!d) return
