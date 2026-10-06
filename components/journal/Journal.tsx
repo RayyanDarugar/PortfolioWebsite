@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import type { Entry } from '@/content/journal'
+import { BackLink } from '@/components/overlays/BackLink'
 import { InAppLink } from '@/components/overlays/InAppLink'
 
 const INK = '#3a2a1c'
@@ -42,7 +43,7 @@ export function JournalContents({ entries }: { entries: readonly Entry[] }) {
 export function JournalEntry({ entry, prev, next }: { entry: Entry; prev: string | null; next: string | null }) {
   return (
     <Page>
-      <Link href="/journal" replace scroll={false} className="text-[2.8cqw] uppercase tracking-[.14em] text-[#8a5a2b] hover:underline" style={PIXEL}>← Contents</Link>
+      <BackLink href="/journal" className="text-[2.8cqw] uppercase tracking-[.14em] text-[#8a5a2b] hover:underline" style={PIXEL}>← Contents</BackLink>
       <p className="mt-[4cqw] text-[2.8cqw] uppercase tracking-[.14em] text-[#8a5a2b]" style={PIXEL}>{pretty(entry.date)}</p>
       <h2 className="mt-[1cqw] text-[5.4cqw] leading-[1.15]" style={{ color: INK, fontFamily: 'var(--font-display)', fontWeight: 800 }}>{entry.title}</h2>
       {entry.body.map((p) => (
