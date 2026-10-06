@@ -41,73 +41,87 @@ export function Laptop({
     else el.pause()
   }, [zoom.resting, zoom.measured, live])
 
-  if (live) {
-    return <div className="absolute inset-0" inert={inert} aria-hidden={inert}>{children}</div>
-  }
+  // Where the camera is: `flying` is the room with the desktop pasted into its
+  // screen. Once landed there is no transform and no clip at all (`none`, not
+  // `scale(1)`), so the dock's getBoundingClientRect() measurements are true.
+  // Before the viewport is read (the server and the first client render) the
+  // room at z = 0 is exactly a centred cover image, and the desktop stays out
+  // of sight until it can be clipped to the screen.
+  const flying = !live && zoom.measured
+  const unmeasured = !live && !zoom.measured
 
-  // The server and the first client render have no viewport. At z = 0 the room
-  // is exactly a centred cover image, so draw it that way rather than as a
-  // zero-sized transform, and keep the desktop out of sight until it can be
-  // clipped to the screen.
-  if (!zoom.measured) {
-    return (
-      <div className="absolute inset-0 overflow-hidden">
-        <Image src={SCENE_SRC} alt="" fill priority sizes="100vw"
-               style={{ objectFit: 'cover', ...PIXELATED }} />
-        <div className="invisible absolute inset-0" inert>{children}</div>
-      </div>
-    )
-  }
-
+  // One tree in every state. `children` always sits at the same position under
+  // the same element types, so hydration, landing and take-off never remount
+  // the desktop: its windows keep their state and spring from the dock.
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-0"
-        style={{
-          width: zoom.sceneBox.width,
-          height: zoom.sceneBox.height,
-          transform: zoom.scene,
-          transformOrigin: '0 0',
-        }}
-      >
+      {unmeasured && (
         <Image src={SCENE_SRC} alt="" fill priority sizes="100vw"
-               style={{ objectFit: 'fill', ...PIXELATED }} />
-        <video
-          ref={video}
-          src={SCENE_VIDEO_SRC}
-          poster={SCENE_SRC}
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 h-full w-full"
-          style={{ objectFit: 'fill', ...PIXELATED }}
-        />
-      </motion.div>
+               style={{ objectFit: 'cover', ...PIXELATED }} />
+      )}
 
-      {/* The desktop, cut to the drawn screen. Black behind it, because the
-          desktop is fitted rather than cropped and a sliver shows where the two
-          shapes disagree: a lit screen with a hair of black at its edge. */}
-      <motion.div className="absolute inset-0" style={{ clipPath: zoom.clip, background: '#000' }}>
-        <motion.div className="absolute inset-0" style={{ transform: zoom.camera }} inert={inert} aria-hidden={inert}>
+      {flying && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-0"
+          style={{
+            width: zoom.sceneBox.width,
+            height: zoom.sceneBox.height,
+            transform: zoom.scene,
+            transformOrigin: '0 0',
+          }}
+        >
+          <Image src={SCENE_SRC} alt="" fill priority sizes="100vw"
+                 style={{ objectFit: 'fill', ...PIXELATED }} />
+          <video
+            ref={video}
+            src={SCENE_VIDEO_SRC}
+            poster={SCENE_SRC}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: 'fill', ...PIXELATED }}
+          />
+        </motion.div>
+      )}
+
+      {/* The desktop, cut to the drawn screen while flying. Black behind it,
+          because the desktop is fitted rather than cropped and a sliver shows
+          where the two shapes disagree: a lit screen with a hair of black at
+          its edge. */}
+      <motion.div
+        className={`absolute inset-0 ${unmeasured ? 'invisible' : ''}`}
+        style={flying
+          ? { clipPath: zoom.clip, background: '#000' }
+          : { clipPath: 'none', background: 'transparent' }}
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{ transform: flying ? zoom.camera : 'none' }}
+          inert={inert}
+          aria-hidden={inert}
+        >
           {children}
         </motion.div>
 
-        <motion.img
-          aria-hidden
-          src={SCREEN_PIXEL_SRC}
-          alt=""
-          width={PIXEL_SCREEN_W}
-          height={PIXEL_SCREEN_H}
-          className="pointer-events-none absolute left-0 top-0 max-w-none"
-          style={{
-            transform: zoom.pixelScreen,
-            transformOrigin: '0 0',
-            opacity: zoom.pixelOpacity,
-            ...PIXELATED,
-          }}
-        />
+        {flying && (
+          <motion.img
+            aria-hidden
+            src={SCREEN_PIXEL_SRC}
+            alt=""
+            width={PIXEL_SCREEN_W}
+            height={PIXEL_SCREEN_H}
+            className="pointer-events-none absolute left-0 top-0 max-w-none"
+            style={{
+              transform: zoom.pixelScreen,
+              transformOrigin: '0 0',
+              opacity: zoom.pixelOpacity,
+              ...PIXELATED,
+            }}
+          />
+        )}
       </motion.div>
     </div>
   )

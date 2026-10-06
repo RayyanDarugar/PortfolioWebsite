@@ -52,6 +52,16 @@ describe('the room', () => {
     expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
   })
 
+  // The Résumé link keeps focus after a click while the room fades; it must not
+  // end up inside an aria-hidden subtree (browsers block that and warn).
+  it('never hides the focused Résumé link from assistive tech', () => {
+    const { rerender } = render(<OS />)
+    screen.getByRole('link', { name: 'Résumé' }).focus()
+    at('/work/resume')
+    rerender(<OS />)
+    expect(document.activeElement?.closest('[aria-hidden="true"]')).toBeNull()
+  })
+
   it('a burst of wheel events navigates once', () => {
     render(<OS />)
     for (let i = 0; i < 5; i += 1) fireEvent.wheel(window, { deltaY: 40 })
@@ -112,6 +122,30 @@ describe('the laptop', () => {
     fireEvent.keyDown(within(search).getByRole('textbox'), { key: 'Escape' })
     expect(screen.queryByRole('dialog', { name: 'Search' })).toBeNull()
     expect(nav.push).not.toHaveBeenCalled()
+  })
+})
+
+describe('Esc while something else is in flight', () => {
+  // Clicking the panel's padding moves focus to <body>, so Esc never reaches
+  // Spotlight's own handler.
+  it('closes only Spotlight even when focus has left it', () => {
+    at('/work')
+    render(<OS />)
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
+    expect(screen.getByRole('dialog', { name: 'Search' })).toBeTruthy()
+    fireEvent.keyDown(document.body, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Search' })).toBeNull()
+    expect(nav.push).not.toHaveBeenCalled()
+  })
+
+  // The corner Résumé link starts a flight to /work/resume; one Esc before it
+  // lands should reverse it, not land on an empty desktop.
+  it('reverses a flight that has not landed back to the room', () => {
+    const { rerender } = render(<OS />)
+    at('/work/resume')
+    rerender(<OS />)
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(nav.push).toHaveBeenCalledWith('/', PUSH_OPTS)
   })
 })
 

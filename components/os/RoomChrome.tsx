@@ -22,8 +22,10 @@ export function RoomChrome({
   zoom, hidden, onOpenLaptop,
 }: { zoom: Zoom; hidden: boolean; onOpenLaptop: () => void }) {
   return (
+    // `inert` alone, not aria-hidden: inert already takes the room out of the
+    // accessibility tree, and aria-hidden over a link that still has focus
+    // (the Résumé link, just clicked) is blocked by browsers.
     <motion.div
-      aria-hidden={hidden}
       inert={hidden}
       className="pointer-events-none absolute inset-0 z-[80]"
       style={{ opacity: zoom.roomUi }}

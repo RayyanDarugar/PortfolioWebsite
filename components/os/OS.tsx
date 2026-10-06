@@ -74,15 +74,20 @@ export function OS() {
     return () => window.removeEventListener('resize', resolve)
   }, [])
 
-  // Esc steps out one level: an open app to the desktop, the desktop to the
-  // room. A component that handled Esc itself (Spotlight) marks it handled.
+  // Esc steps out one level: Spotlight, then an open app to the desktop, then
+  // the desktop to the room. A component that handled Esc itself marks it handled.
   // ⌘K / Ctrl-K toggles Spotlight, on the landed desktop only.
   useEffect(() => {
     if (mode !== 'os') return
     const onKey = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return
       if (event.key === 'Escape') {
-        if (view.app) go(pathFor(DESKTOP))
+        // Spotlight first, wherever focus is: clicking its padding sends focus
+        // to <body>, out of reach of its own handler.
+        if (spotlight) closeSpotlight()
+        // A flight that has not landed reverses to the room in one press.
+        else if (view.zoomed && !landed) go(pathFor(ROOM))
+        else if (view.app) go(pathFor(DESKTOP))
         else if (view.zoomed) go(pathFor(ROOM))
         return
       }
@@ -93,7 +98,7 @@ export function OS() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [mode, view.app, view.zoomed, landed, pathname, go])
+  }, [mode, view.app, view.zoomed, landed, pathname, spotlight, closeSpotlight, go])
 
   // Scrolling down in the room is a shortcut into the laptop. A trackpad flick
   // is dozens of wheel events, so this fires once per visit to the room.

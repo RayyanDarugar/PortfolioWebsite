@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { useEffect } from 'react'
 import { render, screen } from '@testing-library/react'
 import { Laptop } from '../Laptop'
 import type { Zoom } from '../useZoom'
@@ -43,6 +44,22 @@ describe('Laptop', () => {
     const { container } = render(<Laptop zoom={unmeasured} inert live={false}><p>desk</p></Laptop>)
     expect(container.querySelector('video')).toBeNull()
     expect(screen.getByText('desk').closest('.invisible')).not.toBeNull()
+  })
+
+  // The desktop must survive hydration, landing and take-off: a remount drops
+  // its state and makes a window pop in instead of springing from the dock.
+  it('keeps the desktop mounted across every branch', () => {
+    let mounts = 0
+    function Desk() {
+      useEffect(() => { mounts += 1 }, [])
+      return <p>desk</p>
+    }
+    const unmeasured = { ...stub, measured: false } as Zoom
+    const { rerender } = render(<Laptop zoom={unmeasured} inert live={false}><Desk /></Laptop>)
+    rerender(<Laptop zoom={stub} inert live={false}><Desk /></Laptop>)
+    rerender(<Laptop zoom={stub} inert={false} live><Desk /></Laptop>)
+    rerender(<Laptop zoom={stub} inert live={false}><Desk /></Laptop>)
+    expect(mounts).toBe(1)
   })
 
   // Regression from the AE shell: the video element only exists in the room
