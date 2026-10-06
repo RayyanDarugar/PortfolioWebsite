@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
+import { useMotionValue } from 'framer-motion'
 import { useZoom } from '../useZoom'
 
 describe('useZoom', () => {
@@ -8,7 +9,7 @@ describe('useZoom', () => {
     expect(result.current.phase).toBe('room')
     expect(result.current.resting).toBe(true)
     expect(result.current.measured).toBe(true)
-    expect(result.current.hit).not.toBeNull()
+    expect(result.current.rest).not.toBeNull()
   })
 
   it('starts landed when the URL is already inside the laptop', () => {
@@ -51,5 +52,17 @@ describe('useZoom', () => {
     rerender({ zoomed: false })
     await waitFor(() => expect(result.current.resting).toBe(true), { timeout: 4000 })
     expect(result.current.phase).toBe('room')
+  })
+
+  // The pan moves the room at rest and is folded out by landing, so the
+  // landed desktop is never offset.
+  it('applies the pan at rest and none once landed', async () => {
+    const { result: pan } = renderHook(() => useMotionValue(40))
+    const { result, rerender } = renderHook(({ zoomed }) => useZoom(zoomed, true, pan.current), {
+      initialProps: { zoomed: false },
+    })
+    expect(result.current.roomX.get()).toBe(40)
+    rerender({ zoomed: true })
+    await waitFor(() => expect(result.current.roomX.get()).toBe(0))
   })
 })

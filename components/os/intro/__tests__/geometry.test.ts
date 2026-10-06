@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import {
-  SCENE_ASPECT, SCREEN_L, SCREEN_T, camera, clip, hole, isDownwardWheel, isUpwardWheel,
+  SCREEN_L, SCREEN_T, camera, clip, hole, isDownwardWheel, isUpwardWheel,
   pixelFade, roomUiFade, scene, window01,
 } from '../geometry'
+import { roomRect } from '@/components/room/layout'
 
 const VW = 1512
 const VH = 950
+const REST = roomRect(VW, VH)
 
 describe('window01', () => {
   it('normalises into its own window and clamps outside it', () => {
@@ -16,17 +18,12 @@ describe('window01', () => {
 })
 
 describe('the scene', () => {
-  it('covers the viewport at rest, like any hero image', () => {
-    const s = scene(0, VW, VH)
-    expect(s.w).toBeGreaterThanOrEqual(VW)
-    expect(s.h).toBeGreaterThanOrEqual(VH)
-    expect(s.w / s.h).toBeCloseTo(SCENE_ASPECT, 4)
-    expect(s.x).toBeLessThanOrEqual(0)
-    expect(s.x + s.w).toBeGreaterThanOrEqual(VW)
+  it('is the room at rest at z = 0', () => {
+    expect(scene(0, VW, VH, REST)).toEqual(REST)
   })
 
   it('is scaled so its screen is the viewport at z = 1', () => {
-    const s = scene(1, VW, VH)
+    const s = scene(1, VW, VH, REST)
     expect(s.x + SCREEN_L * s.w).toBeCloseTo(0, 6)
     expect(s.y + SCREEN_T * s.h).toBeCloseTo(0, 6)
   })
@@ -34,14 +31,15 @@ describe('the scene', () => {
 
 describe('the screen hole', () => {
   // Low enough to stay clear of the name card in the top corner, and fully in frame.
-  it('sits on the desk, below the top of the room, at rest', () => {
-    const r = hole(0, VW, VH)
-    expect(r.y).toBeGreaterThan(VH * 0.4)
-    expect(r.y + r.h).toBeLessThan(VH)
+  it('sits inside the room, on the desk, at rest', () => {
+    const r = hole(0, VW, VH, REST)
+    expect(r.x).toBeGreaterThan(REST.x)
+    expect(r.y).toBeGreaterThan(REST.y + REST.h * 0.4)
+    expect(r.y + r.h).toBeLessThan(REST.y + REST.h)
   })
 
   it('is exactly the viewport at z = 1', () => {
-    const r = hole(1, VW, VH)
+    const r = hole(1, VW, VH, REST)
     expect(r.x).toBeCloseTo(0, 6)
     expect(r.y).toBeCloseTo(0, 6)
     expect(r.w).toBeCloseTo(VW, 6)
@@ -50,8 +48,8 @@ describe('the screen hole', () => {
 
   it('grows monotonically toward the viewport', () => {
     for (let i = 0; i < 40; i += 1) {
-      const a = hole(i / 40, VW, VH)
-      const b = hole((i + 1) / 40, VW, VH)
+      const a = hole(i / 40, VW, VH, REST)
+      const b = hole((i + 1) / 40, VW, VH, REST)
       expect(b.w).toBeGreaterThanOrEqual(a.w)
       expect(b.h).toBeGreaterThanOrEqual(a.h)
     }
@@ -62,8 +60,8 @@ describe('camera', () => {
   it('fits the desktop inside the drawn screen at every point', () => {
     for (let i = 0; i <= 20; i += 1) {
       const z = i / 20
-      const c = camera(z, VW, VH)
-      const r = hole(z, VW, VH)
+      const c = camera(z, VW, VH, REST)
+      const r = hole(z, VW, VH, REST)
       expect(VW * c.scale).toBeLessThanOrEqual(r.w + 1e-6)
       expect(VH * c.scale).toBeLessThanOrEqual(r.h + 1e-6)
     }
@@ -72,7 +70,7 @@ describe('camera', () => {
   // The landed desktop is unscaled and unmoved, so every getBoundingClientRect()
   // in it (the dock tiles, the window launch origins) is true.
   it('is identity at z = 1', () => {
-    const c = camera(1, VW, VH)
+    const c = camera(1, VW, VH, REST)
     expect(c.scale).toBeCloseTo(1, 9)
     expect(c.x).toBeCloseTo(0, 9)
     expect(c.y).toBeCloseTo(0, 9)
@@ -81,9 +79,9 @@ describe('camera', () => {
 
 describe('clip', () => {
   it('cuts the desktop down to the hole at rest and is no clip at z = 1', () => {
-    const rest = clip(0, VW, VH)
+    const rest = clip(0, VW, VH, REST)
     expect(Math.min(rest.top, rest.right, rest.bottom, rest.left)).toBeGreaterThan(0)
-    const landed = clip(1, VW, VH)
+    const landed = clip(1, VW, VH, REST)
     expect(landed.top).toBeCloseTo(0, 9)
     expect(landed.right).toBeCloseTo(0, 9)
     expect(landed.bottom).toBeCloseTo(0, 9)

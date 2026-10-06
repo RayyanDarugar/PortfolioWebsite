@@ -62,58 +62,42 @@ export function roomUiFade(z: number): number {
 export interface Rect { x: number; y: number; w: number; h: number }
 
 /**
- * Where the scene picture sits, in viewport pixels. At z = 0 it covers the
- * viewport, centred; at z = 1 it is scaled so its screen hole is the viewport.
- * Centred is not a default: the room is drawn with content hard against its
- * right edge, so any sideways offset pulls a seam into frame.
+ * Where the room sits, in viewport pixels, at camera progress `z`. At z = 0 it
+ * is the room at rest (`rest`, from `roomRect`); at z = 1 it is scaled so its
+ * screen hole is the viewport exactly. Linear between: the easing is on z.
  */
-export function scene(z: number, vw: number, vh: number): Rect {
-  const w0 = Math.max(vw, vh * SCENE_ASPECT)
-  const h0 = w0 / SCENE_ASPECT
-  const x0 = (vw - w0) / 2
-  const y0 = (vh - h0) / 2
-
+export function scene(z: number, vw: number, vh: number, rest: Rect): Rect {
   const w1 = vw / HOLE_W
   const h1 = vh / HOLE_H
   const x1 = -SCREEN_L * w1
   const y1 = -SCREEN_T * h1
-
   return {
-    x: x0 + (x1 - x0) * z,
-    y: y0 + (y1 - y0) * z,
-    w: w0 + (w1 - w0) * z,
-    h: h0 + (h1 - h0) * z,
+    x: rest.x + (x1 - rest.x) * z,
+    y: rest.y + (y1 - rest.y) * z,
+    w: rest.w + (w1 - rest.w) * z,
+    h: rest.h + (h1 - rest.h) * z,
   }
 }
 
 /** The drawn screen, in viewport pixels. Derived from {@link scene}, so the
  *  picture and the live desktop cannot drift apart. */
-export function hole(z: number, vw: number, vh: number): Rect {
-  const s = scene(z, vw, vh)
-  return {
-    x: s.x + SCREEN_L * s.w,
-    y: s.y + SCREEN_T * s.h,
-    w: HOLE_W * s.w,
-    h: HOLE_H * s.h,
-  }
+export function hole(z: number, vw: number, vh: number, rest: Rect): Rect {
+  const s = scene(z, vw, vh, rest)
+  return { x: s.x + SCREEN_L * s.w, y: s.y + SCREEN_T * s.h, w: HOLE_W * s.w, h: HOLE_H * s.h }
 }
 
 /** The desktop's transform: rendered at viewport size and scaled *down* to fit
  *  the hole (fit, not cover, so no menu bar or icon is cropped). Identity at 1. */
-export function camera(z: number, vw: number, vh: number): { scale: number; x: number; y: number } {
-  const r = hole(z, vw, vh)
-  return {
-    scale: Math.min(r.w / vw, r.h / vh),
-    x: r.x + r.w / 2 - vw / 2,
-    y: r.y + r.h / 2 - vh / 2,
-  }
+export function camera(z: number, vw: number, vh: number, rest: Rect): { scale: number; x: number; y: number } {
+  const r = hole(z, vw, vh, rest)
+  return { scale: Math.min(r.w / vw, r.h / vh), x: r.x + r.w / 2 - vw / 2, y: r.y + r.h / 2 - vh / 2 }
 }
 
 /** The desktop's clip, as `inset()` edges in viewport pixels. All 0 at z = 1. */
-export function clip(z: number, vw: number, vh: number): {
+export function clip(z: number, vw: number, vh: number, rest: Rect): {
   top: number; right: number; bottom: number; left: number
 } {
-  const r = hole(z, vw, vh)
+  const r = hole(z, vw, vh, rest)
   return { top: r.y, right: vw - r.x - r.w, bottom: vh - r.y - r.h, left: r.x }
 }
 

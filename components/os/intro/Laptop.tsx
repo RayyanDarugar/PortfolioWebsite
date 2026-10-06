@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import type { ReactNode } from 'react'
+import { restCss } from '@/components/room/layout'
 import { PIXEL_SCREEN_H, PIXEL_SCREEN_W } from './geometry'
 import type { Zoom } from './useZoom'
 
@@ -14,57 +15,48 @@ export const SCREEN_PIXEL_SRC = '/hero/screen-pixel.png'
 
 const PIXELATED = { imageRendering: 'pixelated' } as const
 
+/** The room as one flattened picture: the default until `RoomScene` draws it in layers. */
+function RoomPicture() {
+  return <Image src={SCENE_SRC} alt="" fill priority sizes="112vw" style={{ objectFit: 'fill', ...PIXELATED }} />
+}
+
 /**
  * The room, and the live desktop pasted into its drawn screen.
  *
- * One picture, with a black rectangle where the screen is; `geometry.ts` knows
- * that rectangle. The room, the clip and the desktop's transform all derive
- * from one interpolated rect, so the drawing and the live UI cannot drift
- * apart mid-flight. Once landed (`live`), the desktop renders with no
- * transform at all, so the dock's getBoundingClientRect() measurements are true.
+ * The room box is laid out at the room's rest size and moved by one
+ * transform derived from the zoom, so the room, the screen hole and the
+ * desktop's clip cannot drift apart mid-flight. The outer layer carries the
+ * pan, faded out as the camera lands (`roomX`), so landing is exact.
+ *
+ * Before the viewport is measured (the server and the first client render)
+ * the room box is placed by `restCss()`, the same rule in CSS, and the desktop
+ * stays out of sight until it can be clipped to the screen. The room is drawn
+ * in every state, hidden once landed, so its h1 is always in the HTML.
  */
 export function Laptop({
-  zoom, inert, live, children,
-}: { zoom: Zoom; inert: boolean; live: boolean; children: ReactNode }) {
-  // Where the camera is: `flying` is the room with the desktop pasted into its
-  // screen. Once landed there is no transform and no clip at all (`none`, not
-  // `scale(1)`), so the dock's getBoundingClientRect() measurements are true.
-  // Before the viewport is read (the server and the first client render) the
-  // room at z = 0 is exactly a centred cover image, and the desktop stays out
-  // of sight until it can be clipped to the screen.
+  zoom, inert, live, room = <RoomPicture />, children,
+}: { zoom: Zoom; inert: boolean; live: boolean; room?: ReactNode; children: ReactNode }) {
   const flying = !live && zoom.measured
   const unmeasured = !live && !zoom.measured
+  const hidden = live ? 'hidden' : 'visible'
 
-  // One tree in every state. `children` always sits at the same position under
-  // the same element types, so hydration, landing and take-off never remount
-  // the desktop: its windows keep their state and spring from the dock.
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {unmeasured && (
-        <Image src={SCENE_SRC} alt="" fill priority sizes="100vw"
-               style={{ objectFit: 'cover', ...PIXELATED }} />
-      )}
-
-      {flying && (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-0"
-          style={{
-            width: zoom.sceneBox.width,
-            height: zoom.sceneBox.height,
-            transform: zoom.scene,
-            transformOrigin: '0 0',
-          }}
-        >
-          <Image src={SCENE_SRC} alt="" fill priority sizes="100vw"
-                 style={{ objectFit: 'fill', ...PIXELATED }} />
-        </motion.div>
-      )}
+    <motion.div className="absolute inset-0 overflow-hidden" style={{ x: zoom.roomX }}>
+      <motion.div
+        className="absolute"
+        style={zoom.measured
+          ? {
+            left: 0, top: 0, width: zoom.sceneBox.width, height: zoom.sceneBox.height,
+            transform: zoom.scene, transformOrigin: '0 0', visibility: hidden,
+          }
+          : { ...restCss(), visibility: hidden }}
+      >
+        {room}
+      </motion.div>
 
       {/* The desktop, cut to the drawn screen while flying. Black behind it,
           because the desktop is fitted rather than cropped and a sliver shows
-          where the two shapes disagree: a lit screen with a hair of black at
-          its edge. */}
+          where the two shapes disagree. */}
       <motion.div
         className={`absolute inset-0 ${unmeasured ? 'invisible' : ''}`}
         style={flying
@@ -88,15 +80,10 @@ export function Laptop({
             width={PIXEL_SCREEN_W}
             height={PIXEL_SCREEN_H}
             className="pointer-events-none absolute left-0 top-0 max-w-none"
-            style={{
-              transform: zoom.pixelScreen,
-              transformOrigin: '0 0',
-              opacity: zoom.pixelOpacity,
-              ...PIXELATED,
-            }}
+            style={{ transform: zoom.pixelScreen, transformOrigin: '0 0', opacity: zoom.pixelOpacity, ...PIXELATED }}
           />
         )}
       </motion.div>
-    </div>
+    </motion.div>
   )
 }

@@ -18,6 +18,8 @@ const stub = {
   pixelOpacity: 1,
   roomUi: 1,
   sceneBox: { width: 100, height: 100 },
+  rest: { x: 0, y: 0, w: 100, h: 50 },
+  roomX: 0,
 } as unknown as Zoom
 
 describe('Laptop', () => {
@@ -46,5 +48,13 @@ describe('Laptop', () => {
     rerender(<Laptop zoom={stub} inert={false} live><Desk /></Laptop>)
     rerender(<Laptop zoom={stub} inert live={false}><Desk /></Laptop>)
     expect(mounts).toBe(1)
+  })
+
+  // The room's h1 must be in the HTML whatever the URL, including /work/*.
+  it('draws the room in every state, hidden once landed', () => {
+    const { rerender } = render(<Laptop zoom={stub} inert live={false} room={<h1>room</h1>}><p>desk</p></Laptop>)
+    expect(screen.getByRole('heading', { name: 'room' })).toBeTruthy()
+    rerender(<Laptop zoom={stub} inert={false} live room={<h1>room</h1>}><p>desk</p></Laptop>)
+    expect(screen.getByText('room').closest('[style*="hidden"]')).not.toBeNull()
   })
 })
