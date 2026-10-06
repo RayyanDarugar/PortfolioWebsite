@@ -15,7 +15,8 @@
 // Usage: node scripts/art/cut-room.mjs
 // Writes public/room/sunset.png (the master), base.png and sprites/<id>.png,
 // public/room/<variant>.png and sprites/<id>.<variant>.png (day, night), and
-// public/room/sprites.json (positions in master pixels; list order is draw order).
+// public/room/sprites.json (positions in master pixels; list order is draw order)
+// and public/room/hitmap.png (quarter scale; R = topmost sprite index + 1).
 
 import sharp from 'sharp'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -219,9 +220,21 @@ async function main() {
   }
   const manifest = { width: W, height: H, sprites: [] }
 
-  for (const obj of OBJECTS) {
+  // Hit map: quarter scale, R = index + 1 of the topmost sprite (list order is
+  // draw order, so later objects overwrite earlier ones), 0 for none.
+  const HIT_SCALE = 4
+  const HW = Math.floor(W / HIT_SCALE), HH = Math.floor(H / HIT_SCALE)
+  const hit = Buffer.alloc(HW * HH * 3)
+
+  for (const [index, obj] of OBJECTS.entries()) {
     let mask = await outline(obj, W, H)
     if (obj.matte) mask = grow(mask, W, H, GROW)
+    for (let y = 0; y < HH; y++) for (let x = 0; x < HW; x++) {
+      if (mask[(y * HIT_SCALE + 2) * W + x * HIT_SCALE + 2]) {
+        const o = (y * HW + x) * 3
+        hit[o] = hit[o + 1] = hit[o + 2] = index + 1
+      }
+    }
     const [x0, y0, x1, y1] = bounds(mask, W, H)
     const w = x1 - x0, h = y1 - y0
     await cutSprite(master, mask, W, [x0, y0, x1, y1], `${OUT}/sprites/${obj.id}.png`)
@@ -241,6 +254,7 @@ async function main() {
   await sharp(base, { raw: { width: W, height: H, channels: 3 } }).png().toFile(`${OUT}/base.png`)
   // The flattened room, for anything that draws the room as one picture.
   await sharp(master, { raw: { width: W, height: H, channels: 3 } }).png().toFile(`${OUT}/sunset.png`)
+  await sharp(hit, { raw: { width: HW, height: HH, channels: 3 } }).png().toFile(`${OUT}/hitmap.png`)
   writeFileSync(`${OUT}/sprites.json`, JSON.stringify(manifest, null, 2) + '\n')
 
   // Check: base + sprites in draw order must rebuild the master exactly.
