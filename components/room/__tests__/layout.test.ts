@@ -1,22 +1,33 @@
 import { describe, it, expect } from 'vitest'
 import { SCENE_ASPECT, SCENE_PX_H, SCENE_PX_W } from '@/components/os/intro/geometry'
-import { HOTBAR_BAND, OVERSCAN, panFor, panRange, restCss, roomRect, toArt } from '../layout'
+import { panFor, panRange, restCss, roomRect, toArt } from '../layout'
 
 describe('roomRect', () => {
-  it('is 110.9% of the viewport wide, centred, above the hotbar band', () => {
+  // The room covers the whole screen, like a game; the hotbar floats over it.
+  it('fills the height of a typical screen and overhangs both sides', () => {
     const r = roomRect(1440, 900)
-    expect(r.w).toBeCloseTo(1440 * OVERSCAN, 6)
+    expect(r.h).toBeCloseTo(900, 6)
+    expect(r.y).toBeCloseTo(0, 6)
     expect(r.w / r.h).toBeCloseTo(SCENE_ASPECT, 6)
     expect(r.x).toBeCloseTo((1440 - r.w) / 2, 6)
-    expect(r.y).toBeGreaterThanOrEqual(0)
-    expect(r.y + r.h).toBeLessThanOrEqual(900 - HOTBAR_BAND + 1e-6)
+    expect(r.w).toBeGreaterThan(1440)
   })
 
-  it('is limited by height on short viewports, and then centred', () => {
-    const r = roomRect(1440, 700)
-    expect(r.h).toBeCloseTo(700 - HOTBAR_BAND, 6)
-    expect(r.w / r.h).toBeCloseTo(SCENE_ASPECT, 6)
-    expect(r.x).toBeCloseTo((1440 - r.w) / 2, 6)
+  it('fills the width of a very wide screen, cropping top and bottom evenly', () => {
+    const r = roomRect(2560, 1000)
+    expect(r.w).toBeCloseTo(2560, 6)
+    expect(r.h).toBeGreaterThanOrEqual(1000)
+    expect(r.y).toBeCloseTo((1000 - r.h) / 2, 6)
+  })
+
+  it('never leaves a band on any side', () => {
+    for (const [vw, vh] of [[1000, 680], [1200, 886], [1440, 900], [1920, 1080], [2560, 1080], [3440, 1440]]) {
+      const r = roomRect(vw, vh)
+      expect(r.x).toBeLessThanOrEqual(1e-6)
+      expect(r.y).toBeLessThanOrEqual(1e-6)
+      expect(r.x + r.w).toBeGreaterThanOrEqual(vw - 1e-6)
+      expect(r.y + r.h).toBeGreaterThanOrEqual(vh - 1e-6)
+    }
   })
 })
 
@@ -38,10 +49,10 @@ describe('panFor', () => {
     }
   })
 
-  it('does not pan a room narrower than the viewport', () => {
-    const narrow = roomRect(1440, 600)
-    expect(panRange(narrow, 1440)).toBe(0)
-    expect(panFor(0, 1440, narrow)).toBe(0)
+  it('does not pan a room exactly as wide as the viewport', () => {
+    const wide = roomRect(2560, 1000)
+    expect(panRange(wide, 2560)).toBe(0)
+    expect(panFor(0, 2560, wide)).toBe(0)
   })
 })
 
@@ -63,10 +74,10 @@ describe('toArt', () => {
 })
 
 describe('restCss', () => {
-  it('states the same rule in CSS, from the same constants', () => {
+  it('states the same cover rule in CSS', () => {
     const css = restCss()
-    expect(css.height).toContain('110.90vw')
-    expect(css.height).toContain(`${HOTBAR_BAND}px`)
-    expect(css.width).toContain(String(SCENE_ASPECT))
+    expect(css.width).toContain('100vw')
+    expect(css.width).toContain(`100vh * ${SCENE_ASPECT}`)
+    expect(css.height).toContain(`/ ${SCENE_ASPECT}`)
   })
 })

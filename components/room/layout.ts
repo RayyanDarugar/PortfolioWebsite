@@ -4,27 +4,18 @@ import { SCENE_ASPECT, SCENE_PX_H, SCENE_PX_W, type Rect } from '@/components/os
  * Where the room sits, and how it pans. Pure: every number here is a
  * function of the viewport and the pointer.
  *
- * Spec §2: the canvas is ≈110.9% of the viewport width, so everything is
- * visible at rest and the cursor pans only the edge slivers into view. The
- * art is 21:9, so at that width it is shorter than most viewports. It sits
- * centred above a band kept for the hotbar, and the bands around it are
- * filled by `RoomBackdrop`. When the viewport is too short for that, the room
- * is limited by height instead (and pans further, or not at all).
+ * The room covers the whole screen, like a game, with the hotbar floating over
+ * it. (The spec asked for ≈110.9% of the width with the rest of the screen
+ * filled around it; Rayyan found the bands odd and asked for it closer.) The
+ * art is 21:9, so on most screens it fills the height and overhangs the sides,
+ * and the cursor pans the sides into view; on very wide screens it fills the
+ * width and loses a sliver top and bottom.
  */
 
-export const OVERSCAN = 1.109
-/** Px kept clear at the bottom for the hotbar. */
-export const HOTBAR_BAND = 112
-
 export function roomRect(vw: number, vh: number): Rect {
-  const avail = Math.max(0, vh - HOTBAR_BAND)
-  let w = vw * OVERSCAN
-  let h = w / SCENE_ASPECT
-  if (h > avail) {
-    h = avail
-    w = h * SCENE_ASPECT
-  }
-  return { x: (vw - w) / 2, y: (avail - h) / 2, w, h }
+  const w = Math.max(vw, vh * SCENE_ASPECT)
+  const h = w / SCENE_ASPECT
+  return { x: (vw - w) / 2, y: (vh - h) / 2, w, h }
 }
 
 /** How far the room may move either way from rest without showing past an edge. */
@@ -55,15 +46,15 @@ export function toArt(
 
 /**
  * `roomRect` as CSS, for the server render and the first client render,
- * which have no viewport to measure. Same constants, same rule, so the room
- * does not move when the measured layout takes over.
+ * which have no viewport to measure. Same rule, so the room does not move when
+ * the measured layout takes over.
  */
 export function restCss(): { left: string; top: string; width: string; height: string } {
-  const h = `min(${(OVERSCAN * 100).toFixed(2)}vw / ${SCENE_ASPECT}, 100vh - ${HOTBAR_BAND}px)`
+  const w = `max(100vw, 100vh * ${SCENE_ASPECT})`
   return {
-    width: `calc(${h} * ${SCENE_ASPECT})`,
-    height: `calc(${h})`,
-    left: `calc((100vw - ${h} * ${SCENE_ASPECT}) / 2)`,
-    top: `calc((100vh - ${HOTBAR_BAND}px - ${h}) / 2)`,
+    width: w,
+    height: `calc(${w} / ${SCENE_ASPECT})`,
+    left: `calc((100vw - ${w}) / 2)`,
+    top: `calc((100vh - ${w} / ${SCENE_ASPECT}) / 2)`,
   }
 }

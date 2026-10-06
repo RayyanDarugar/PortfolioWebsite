@@ -1,12 +1,12 @@
 'use client'
 import Image from 'next/image'
 import { HOTBAR, spriteFor, type HotbarSlot } from '@/content/room'
-import { HOTBAR_BAND } from './layout'
 
 const PIXEL_TEXT = { fontFamily: 'var(--font-pixel)', textShadow: '1px 1px 0 rgba(0,0,0,.85)' }
 
 /**
- * The Minecraft-style hotbar (spec §3): nine slots, each an object, labelled
+ * The Minecraft-style hotbar (spec §3), floating over the bottom of the room:
+ * nine slots, each an object, labelled
  * without hovering. It is nav, legend and keyboard access at once. Hovering
  * or focusing a slot lights its object(s); clicking acts exactly like clicking
  * the object. Number keys are handled by the OS root, which knows when the
@@ -21,8 +21,13 @@ export function Hotbar({
   return (
     <nav
       aria-label="Hotbar"
-      className="pointer-events-auto absolute inset-x-0 bottom-0 flex items-center justify-center"
-      style={{ height: HOTBAR_BAND }}
+      className="pointer-events-auto absolute bottom-[14px] left-1/2 -translate-x-1/2 rounded-[14px] px-[10px] pb-[6px] pt-[8px]"
+      style={{
+        background: 'rgba(22,14,9,.5)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        border: '1px solid rgba(255,214,140,.18)',
+      }}
     >
       <ol className="flex items-start gap-[6px]">
         {HOTBAR.map((slot) => {
