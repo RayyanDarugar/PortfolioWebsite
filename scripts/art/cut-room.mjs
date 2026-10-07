@@ -38,11 +38,20 @@ const VARIANTS = {
 /**
  * `matte`: outline from MATTES/<id>.png, whose top-left sits at `at`.
  * `rect`: the rectangle [x0, y0, x1, y1] is the outline.
+ * `poly`: a traced polygon [[x, y], ...] is the outline, for big geometric
+ *   things a rectangle would overshoot (into the desk, the wall).
+ * `leaves`: also take the green pixels in [x0, y0, x1, y1] (a trailing plant).
  * `stays`: drawn in the base as well; the sprite exists only for the hover glow.
  */
 const OBJECTS = [
   { id: 'window', rect: [2278, 0, 2688, 852], stays: true },
-  { id: 'bookshelf', rect: [1606, 0, 1990, 1060], stays: true },
+  // Stops at the shelf's own side panel (the pillar right of it is wall) and
+  // leaves out the desk top and leg in front of its lower left.
+  {
+    id: 'bookshelf', stays: true,
+    poly: [[1602, 0], [1952, 0], [1952, 1052], [1762, 1010], [1762, 838], [1778, 838], [1778, 746], [1602, 746]],
+    leaves: [1880, 0, 2075, 585],
+  },
   { id: 'flags', matte: true, at: [0, 0] },
   { id: 'photo-dog', rect: [336, 263, 514, 399] },
   { id: 'photo-beach', rect: [336, 421, 515, 565] },
@@ -82,6 +91,11 @@ async function outline(obj, W, H) {
     for (let y = y0; y < y1; y++) mask.fill(1, y * W + x0, y * W + x1)
     return mask
   }
+  if (obj.poly) {
+    fillPolygon(mask, W, H, obj.poly)
+    if (obj.leaves) addLeaves(mask, W, obj.leaves, await rgb(MASTER, W, H))
+    return mask
+  }
   const { data, info } = await sharp(`${MATTES}/${obj.id}.png`).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
   const [ax, ay] = obj.at
   for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
@@ -91,6 +105,57 @@ async function outline(obj, W, H) {
     }
   }
   return mask
+}
+
+/** Even-odd scanline fill of `poly`, sampled at pixel centres. */
+function fillPolygon(mask, W, H, poly) {
+  for (let y = 0; y < H; y++) {
+    const cy = y + 0.5, xs = []
+    for (let i = 0; i < poly.length; i++) {
+      const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length]
+      if ((ay <= cy) !== (by <= cy)) xs.push(ax + ((cy - ay) / (by - ay)) * (bx - ax))
+    }
+    xs.sort((a, b) => a - b)
+    for (let k = 0; k + 1 < xs.length; k += 2) {
+      const from = Math.max(0, Math.ceil(xs[k] - 0.5)), to = Math.min(W, Math.ceil(xs[k + 1] - 0.5))
+      if (to > from) mask.fill(1, y * W + from, y * W + to)
+    }
+  }
+}
+
+/** Adds a trailing plant: the leafy pixels of a region (grown by a pixel or
+ *  two so each leaf's dark outline comes along), keeping only what hangs off
+ *  the outline so far, so stray sunlit specks on the wall stay out. */
+function addLeaves(mask, W, [x0, y0, x1, y1], img) {
+  const w = x1 - x0, h = y1 - y0, leaf = new Uint8Array(w * h)
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = ((y0 + y) * W + x0 + x) * 3, r = img[i], g = img[i + 1], b = img[i + 2]
+    leaf[y * w + x] = g > 0.78 * r && g > 1.35 * b && g > 40 ? 1 : 0 // olive leaves; the pillar is orange (g ≈ .6 r)
+  }
+  const dilate = (r) => {
+    const out = new Uint8Array(w * h)
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (!leaf[y * w + x]) continue
+      for (let yy = Math.max(0, y - r); yy <= Math.min(h - 1, y + r); yy++)
+        out.fill(1, yy * w + Math.max(0, x - r), yy * w + Math.min(w, x + r + 1))
+    }
+    return out
+  }
+  const near = dilate(2) // the outline drawn
+  const reach = dilate(7) // connectivity: a leaf a few px off the vine still hangs from it
+  // Flood `reach` from the pixels already in the outline; keep `near` inside it.
+  const stack = []
+  for (let p = 0; p < w * h; p++) if (reach[p] && mask[(y0 + ((p / w) | 0)) * W + x0 + (p % w)]) stack.push(p)
+  const kept = new Uint8Array(w * h)
+  while (stack.length) {
+    const p = stack.pop()
+    if (kept[p] || !reach[p]) continue
+    kept[p] = 1
+    const px = p % w, py = (p / w) | 0
+    if (px > 0) stack.push(p - 1); if (px < w - 1) stack.push(p + 1)
+    if (py > 0) stack.push(p - w); if (py < h - 1) stack.push(p + w)
+  }
+  for (let p = 0; p < w * h; p++) if (kept[p] && near[p]) mask[(y0 + ((p / w) | 0)) * W + x0 + (p % w)] = 1
 }
 
 function bounds(mask, W, H) {
