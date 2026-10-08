@@ -7,7 +7,8 @@ import { consumeOpenedInApp } from '@/components/overlays/history'
 
 const nav = vi.hoisted(() => {
   const push = vi.fn()
-  return { pathname: '/', push, router: { push, back: () => {}, replace: () => {}, prefetch: () => {} } }
+  const replace = vi.fn()
+  return { pathname: '/', push, router: { push, back: () => {}, replace, prefetch: () => {} } }
 })
 
 vi.mock('next/navigation', () => ({
@@ -25,6 +26,7 @@ const PUSH_OPTS = { scroll: false }
 
 beforeEach(() => {
   nav.push.mockClear()
+  nav.router.replace.mockClear()
   at('/')
 })
 
@@ -278,5 +280,30 @@ describe('server-rendered HTML', () => {
     const html = renderToString(<OS />)
     expect(html).toContain('University of Southern California')
     expect(html.match(/<h1[\s>]/g) ?? []).toHaveLength(1)
+  })
+})
+
+describe('the revamped laptop', () => {
+  it('docks the projects and Experience in order', () => {
+    at('/work')
+    render(<OS />)
+    const dock = screen.getByRole('navigation', { name: 'Apps' })
+    const names = within(dock).getAllByRole('button').map((b) => b.textContent?.trim())
+    expect(names).toEqual(['Résumé', 'Agent Dynamo', 'TikTok Platform', 'News Digest', 'Experience', 'Videos', 'About', 'Contact'])
+  })
+
+  it('serves a project and a role with their text in the HTML', () => {
+    at('/work/dynamo')
+    expect(renderToString(<OS />)).toContain('MIT reports that 95%')
+    at('/work/experience/kana')
+    // The Résumé also carries Kana's bullets; the h2 is Experience's alone.
+    expect(renderToString(<OS />)).toMatch(/<h2[^>]*>Kana<\/h2>/)
+  })
+
+  it('moves Experience’s role by replacing the URL', () => {
+    at('/work/experience/kana')
+    render(<OS />)
+    fireEvent.click(screen.getByRole('button', { name: /California DECA/ }))
+    expect(nav.router.replace).toHaveBeenCalledWith('/work/experience/deca', PUSH_OPTS)
   })
 })

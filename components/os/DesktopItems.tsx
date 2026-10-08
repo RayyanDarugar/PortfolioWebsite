@@ -1,5 +1,7 @@
+import { PROJECTS } from '@/content/projects'
+
 /**
- * What is on the desktop: a disk, a folder and a file, so the stage reads as
+ * What is on the desktop: a disk, a folder per project and a file, so the stage reads as
  * somebody's computer. Scenery only. Nothing here is interactive, and it sits
  * behind every window (z-10 against their 20 and 30).
  */
@@ -9,9 +11,10 @@ interface Item {
   kind: 'disk' | 'folder' | 'doc'
 }
 
+/** The disk, a folder per project, and a file. */
 const ITEMS: readonly Item[] = [
   { name: 'Macintosh HD', kind: 'disk' },
-  { name: 'Projects', kind: 'folder' },
+  ...PROJECTS.map((p) => ({ name: p.name, kind: 'folder' as const })),
   { name: 'notes.txt', kind: 'doc' },
 ]
 

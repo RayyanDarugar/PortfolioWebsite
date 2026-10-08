@@ -89,6 +89,7 @@ export function OS() {
   const roomActive = mode === 'os' && !view.zoomed && !overlayOpen && zoom.resting
 
   const go = useCallback((path: string) => router.push(path, { scroll: false }), [router])
+  const replace = useCallback((path: string) => router.replace(path, { scroll: false }), [router])
   const openLaptop = useCallback(() => go(pathFor(DESKTOP)), [go])
   const closeApp = useCallback(() => go(pathFor(DESKTOP)), [go])
   const openApp = useCallback((id: AppId) => go(pathFor({ zoomed: true, app: id })), [go])
@@ -256,7 +257,13 @@ export function OS() {
                 frame={app.frame}
                 stageInset={STAGE_INSET}
               >
-                <app.Scene onClose={closeApp} />
+                <app.Scene
+                  onClose={closeApp}
+                  active={i === active}
+                  sub={i === active ? view.sub : undefined}
+                  onNavigate={replace}
+                  onOpenApp={openApp}
+                />
               </LaunchedWindow>
             ))}
           </div>

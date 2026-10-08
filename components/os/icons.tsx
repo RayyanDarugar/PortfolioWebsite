@@ -137,3 +137,58 @@ export function FilmGlyph() {
     </svg>
   )
 }
+
+/** Agent Dynamo: a bolt. */
+export function BoltGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
+      <path d="M13.6 2.5 5.2 13.4h5.6l-1.4 8.1 8.4-10.9h-5.6l1.4-8.1Z" fill="#fff" stroke="rgba(120,40,0,.35)" strokeWidth=".8" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** The TikTok platform: a phone playing something. Not TikTok's mark. */
+export function PhoneGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
+      <rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.4" stroke="#fff" strokeWidth="1.6" />
+      <path d="M10.4 9.2v5.6l4.6-2.8-4.6-2.8Z" fill="#FF3B6B" />
+      <rect x="10.2" y="18.2" width="3.6" height="1.2" rx=".6" fill="#fff" />
+    </svg>
+  )
+}
+
+/** The News Digest: a folded paper. */
+export function NewsGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
+      <rect x="3.4" y="4.4" width="17.2" height="15.2" rx="1.6" fill="#fff" stroke="rgba(60,48,30,.45)" strokeWidth="1" />
+      <rect x="5.6" y="6.8" width="12.8" height="2.6" rx=".6" fill="#2B2620" />
+      <rect x="5.6" y="11" width="6" height="5.8" rx=".5" fill="#C9BFAE" />
+      {[11.4, 13.6, 15.8].map((y) => <rect key={y} x="12.8" y={y} width="5.6" height="1.1" rx=".55" fill="rgba(43,38,32,.55)" />)}
+    </svg>
+  )
+}
+
+/** Experience: a briefcase. */
+export function BriefcaseGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
+      <path d="M9 6.4V5a1.6 1.6 0 0 1 1.6-1.6h2.8A1.6 1.6 0 0 1 15 5v1.4" stroke="#fff" strokeWidth="1.6" />
+      <rect x="3" y="6.6" width="18" height="13" rx="2.2" fill="#fff" />
+      <path d="M3 12h18" stroke="#9A6A2E" strokeWidth="1.2" />
+      <rect x="10.6" y="10.8" width="2.8" height="2.6" rx=".6" fill="#9A6A2E" />
+    </svg>
+  )
+}
+
+/** Mission Control: four windows. */
+export function GridGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
+      {[[3, 4], [13, 4], [3, 13.4], [13, 13.4]].map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="8" height="6.6" rx="1.4" fill="#fff" fillOpacity=".92" />
+      ))}
+    </svg>
+  )
+}
