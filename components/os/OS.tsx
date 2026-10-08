@@ -10,6 +10,7 @@ import { RoomScene } from '@/components/room/RoomScene'
 import { WhiteboardIntro } from '@/components/room/WhiteboardIntro'
 import { panFor } from '@/components/room/layout'
 import { useTimeOfDay } from '@/components/room/useTimeOfDay'
+import { headlineMetrics } from '@/content/projects'
 import { HOTBAR, ROOM_OBJECTS, type HotbarSlot } from '@/content/room'
 import { DesktopItems } from './DesktopItems'
 import { Dock } from './Dock'
@@ -20,6 +21,7 @@ import { Stacked } from './Stacked'
 import { Wallpaper } from './Wallpaper'
 import type { Box } from './chrome'
 import { Laptop } from './intro/Laptop'
+import { Picker } from './picker/Picker'
 import { isDownwardWheel, isUpwardWheel } from './intro/geometry'
 import { useZoom } from './intro/useZoom'
 import { APPS, appIndex } from './registry'
@@ -33,6 +35,9 @@ const MIN_HEIGHT = 680
 
 /** Menu bar, dock, and the breathing room either side of a window. */
 const STAGE_INSET = 172
+
+/** The picker's headline strip: flagged project metrics. */
+const HEADLINES = headlineMetrics()
 
 /** Typing somewhere: number keys belong to the field, not the hotbar. */
 function isTyping(target: EventTarget | null): boolean {
@@ -92,6 +97,7 @@ export function OS() {
   const replace = useCallback((path: string) => router.replace(path, { scroll: false }), [router])
   const openLaptop = useCallback(() => go(pathFor(DESKTOP)), [go])
   const closeApp = useCallback(() => go(pathFor(DESKTOP)), [go])
+  const goHome = useCallback(() => go(pathFor(DESKTOP)), [go])
   const openApp = useCallback((id: AppId) => go(pathFor({ zoomed: true, app: id })), [go])
   const openSpotlight = useCallback(() => setSpotlightAt(pathname), [pathname, setSpotlightAt])
   const closeSpotlight = useCallback(() => setSpotlightAt(null), [setSpotlightAt])
@@ -131,6 +137,11 @@ export function OS() {
         else if (view.zoomed) go(pathFor(ROOM))
         return
       }
+      if (landed && event.key === 'F3') {
+        event.preventDefault()
+        goHome()
+        return
+      }
       if (landed && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
         setSpotlightAt((was) => (was === pathname ? null : pathname))
@@ -144,7 +155,7 @@ export function OS() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [mode, view.app, view.zoomed, landed, pathname, spotlight, closeSpotlight, go, roomActive, activateSlot])
+  }, [mode, view.app, view.zoomed, landed, pathname, spotlight, closeSpotlight, go, goHome, roomActive, activateSlot])
 
   // Scrolling is a shortcut both ways: down in the room goes into the laptop,
   // up on the landed desktop comes back out. A trackpad flick is dozens of
@@ -240,6 +251,9 @@ export function OS() {
           <div className="absolute inset-0"><Wallpaper /></div>
           <DesktopItems />
 
+          {/* /work is the picker: the laptop's home screen, never an empty desktop. */}
+          {view.zoomed && !view.app && <Picker apps={APPS} headlines={HEADLINES} onOpen={openApp} />}
+
           {/* Clicking the desktop around an open window closes it. Esc and the
               red light are the keyboard and visible routes to the same thing. */}
           {view.app && (
@@ -273,6 +287,8 @@ export function OS() {
             active={active}
             onSelect={(i) => openApp(APPS[i].id)}
             registerTile={registerTile}
+            onHome={goHome}
+            homeActive={!view.app}
           />
         </Laptop>
 

@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion'
 import { useCallback, useEffect, useRef } from 'react'
 import { GLASS } from './chrome'
+import { GridGlyph } from './icons'
 import type { AppDef } from './registry'
 
 const TILE = 58
@@ -87,7 +88,7 @@ const ASSEMBLE_STAGGER_MS = 45
  * is the day it stops being true silently.
  */
 export function Dock({
-  apps, active, pressed = -1, assembling = false, onSelect, registerTile,
+  apps, active, pressed = -1, assembling = false, onSelect, registerTile, onHome, homeActive = false,
 }: {
   apps: readonly AppDef[]
   active: number
@@ -99,6 +100,10 @@ export function Dock({
   assembling?: boolean
   onSelect: (index: number) => void
   registerTile: (index: number, el: HTMLElement | null) => void
+  /** Mission Control: back to the picker. */
+  onHome?: () => void
+  /** The picker is showing. */
+  homeActive?: boolean
 }) {
   const magnifiers = useRef<(HTMLSpanElement | null)[]>([])
   /** Untransformed tile centres, cached on pointer entry. Reading them live
@@ -177,6 +182,29 @@ export function Dock({
         }}
       >
         <style>{ASSEMBLE_CSS}</style>
+
+        {onHome && (
+          <>
+            <button
+              type="button"
+              onClick={onHome}
+              aria-current={homeActive ? 'true' : undefined}
+              className="group relative flex flex-col items-center rounded-[16px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-white"
+            >
+              <span
+                className="pointer-events-none absolute bottom-[calc(100%+12px)] whitespace-nowrap rounded-[7px] px-[10px] py-[5px] text-[12px] font-bold opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+                style={{ fontFamily: 'var(--font-ui)', background: 'rgba(28,20,42,.86)', color: '#fff', border: '1px solid rgba(255,255,255,.16)', boxShadow: '0 10px 24px rgba(0,0,0,.4)' }}
+              >
+                Mission Control
+              </span>
+              <span className="relative block" style={{ width: TILE, height: TILE, borderRadius: 15, padding: 12, background: 'linear-gradient(#5B6475,#2A3040)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.4), 0 10px 20px -6px rgba(6,8,24,.6)' }}>
+                <GridGlyph />
+              </span>
+              <span aria-hidden className="mt-[5px] block h-[4px] w-[4px] rounded-full" style={{ background: '#fff', opacity: homeActive ? 1 : 0 }} />
+            </button>
+            <span aria-hidden className="mx-[2px] mb-[12px] block h-[46px] w-px self-end" style={{ background: 'rgba(255,255,255,.35)' }} />
+          </>
+        )}
 
         {apps.map((app, i) => {
           const on = i === active

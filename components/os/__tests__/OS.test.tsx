@@ -289,7 +289,7 @@ describe('the revamped laptop', () => {
     render(<OS />)
     const dock = screen.getByRole('navigation', { name: 'Apps' })
     const names = within(dock).getAllByRole('button').map((b) => b.textContent?.trim())
-    expect(names).toEqual(['Résumé', 'Agent Dynamo', 'TikTok Platform', 'News Digest', 'Experience', 'Videos', 'About', 'Contact'])
+    expect(names).toEqual(['Mission Control', 'Résumé', 'Agent Dynamo', 'TikTok Platform', 'News Digest', 'Experience', 'Videos', 'About', 'Contact'])
   })
 
   it('serves a project and a role with their text in the HTML', () => {
@@ -305,5 +305,31 @@ describe('the revamped laptop', () => {
     render(<OS />)
     fireEvent.click(screen.getByRole('button', { name: /California DECA/ }))
     expect(nav.router.replace).toHaveBeenCalledWith('/work/experience/deca', PUSH_OPTS)
+  })
+})
+
+describe('the picker', () => {
+  it('is the laptop’s home screen at /work, server-rendered', () => {
+    at('/work')
+    expect(renderToString(<OS />)).toContain('aria-label="Mission Control"')
+    render(<OS />)
+    fireEvent.click(within(screen.getByRole('region', { name: 'Mission Control' })).getByRole('button', { name: /^Experience/ }))
+    expect(nav.push).toHaveBeenCalledWith('/work/experience', PUSH_OPTS)
+  })
+
+  it('is not shown over an open window', () => {
+    at('/work/resume')
+    render(<OS />)
+    expect(screen.queryByRole('region', { name: 'Mission Control' })).toBeNull()
+  })
+
+  it('comes back from the dock and from F3', () => {
+    at('/work/resume')
+    render(<OS />)
+    fireEvent.click(within(screen.getByRole('navigation', { name: 'Apps' })).getByRole('button', { name: 'Mission Control' }))
+    expect(nav.push).toHaveBeenLastCalledWith('/work', PUSH_OPTS)
+    nav.push.mockClear()
+    fireEvent.keyDown(window, { key: 'F3' })
+    expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
   })
 })
