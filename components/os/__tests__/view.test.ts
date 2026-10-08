@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { APP_IDS, DESKTOP, ROOM, cardPath, isAppId, isRoomOverlay, pathFor, viewFromPath } from '../view'
+import { APP_IDS, DESKTOP, ROOM, cardPath, isAppId, isRoomOverlay, pathFor, rolePath, viewFromPath } from '../view'
 
 describe('viewFromPath', () => {
   it('reads the room, the desktop and an open app', () => {
@@ -50,5 +50,27 @@ describe('room overlays', () => {
 
   it('round-trip through cardPath', () => {
     expect(isRoomOverlay(cardPath('school-usc'))).toBe(true)
+  })
+})
+
+describe('projects and roles', () => {
+  it('open every project as an app', () => {
+    expect(viewFromPath('/work/dynamo')).toEqual({ zoomed: true, app: 'dynamo' })
+    expect(viewFromPath('/work/digest')).toEqual({ zoomed: true, app: 'digest' })
+    expect(isAppId('experience')).toBe(true)
+  })
+
+  it('open a role inside Experience', () => {
+    expect(viewFromPath('/work/experience')).toEqual({ zoomed: true, app: 'experience' })
+    expect(viewFromPath('/work/experience/kana')).toEqual({ zoomed: true, app: 'experience', sub: 'kana' })
+    expect(viewFromPath(rolePath('kana'))).toEqual({ zoomed: true, app: 'experience', sub: 'kana' })
+    expect(pathFor({ zoomed: true, app: 'experience', sub: 'deca' })).toBe('/work/experience/deca')
+  })
+
+  // A mistyped role must be a 404 (an overlay over the room), not a laptop
+  // view the OS half-opens.
+  it('rejects unknown roles, and sub-paths of other apps', () => {
+    expect(viewFromPath('/work/experience/nope')).toBeNull()
+    expect(viewFromPath('/work/dynamo/kana')).toBeNull()
   })
 })

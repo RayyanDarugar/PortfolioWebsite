@@ -13,8 +13,9 @@ import { VideosApp } from '../apps/VideosApp'
 
 describe('the registry', () => {
   // The dock, the URL scheme and the static routes all key on these ids.
-  it('lists exactly the apps the URL scheme knows, in the same order', () => {
-    expect(APPS.map((app) => app.id)).toEqual([...APP_IDS])
+  // Same set, not same order: the dock puts the projects after the Résumé.
+  it('lists exactly the apps the URL scheme knows', () => {
+    expect(APPS.map((app) => app.id).sort()).toEqual([...APP_IDS].sort())
   })
 
   it('finds an app by id, and nothing for no app', () => {

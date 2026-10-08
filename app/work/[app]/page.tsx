@@ -7,7 +7,8 @@ import { isAppId } from '@/components/os/view'
 export const dynamicParams = false
 
 export function generateStaticParams() {
-  return APPS.map((app) => ({ app: app.id }))
+  // /work/experience has its own folder (for its /<role> children).
+  return APPS.filter((app) => app.id !== 'experience').map((app) => ({ app: app.id }))
 }
 
 export async function generateMetadata(
