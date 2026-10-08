@@ -1,15 +1,29 @@
 import { describe, it, expect } from 'vitest'
 import { SCENE_ASPECT, SCENE_PX_H, SCENE_PX_W } from '@/components/os/intro/geometry'
-import { panFor, panRange, restCss, roomRect, toArt } from '../layout'
+import sprites from '@/public/room/sprites.json'
+import { FOCUS_X, panFor, panRange, restCss, roomRect, toArt } from '../layout'
 
 describe('roomRect', () => {
+  // The first screen is centred on the whiteboard (the intro), not on the
+  // art's middle, which left the board off to the left.
+  it('centres the whiteboard on screen at rest', () => {
+    for (const [vw, vh] of [[1440, 900], [1280, 800], [1000, 680], [1920, 1080]]) {
+      const r = roomRect(vw, vh)
+      expect(r.x + FOCUS_X * r.w).toBeCloseTo(vw / 2, 6)
+    }
+  })
+
+  it('anchors on the whiteboard sprite itself', () => {
+    const board = sprites.sprites.find((s) => s.id === 'whiteboard')!
+    expect(FOCUS_X).toBeCloseTo((board.x + board.w / 2) / sprites.width, 6)
+  })
+
   // The room covers the whole screen, like a game; the hotbar floats over it.
   it('fills the height of a typical screen and overhangs both sides', () => {
     const r = roomRect(1440, 900)
     expect(r.h).toBeCloseTo(900, 6)
     expect(r.y).toBeCloseTo(0, 6)
     expect(r.w / r.h).toBeCloseTo(SCENE_ASPECT, 6)
-    expect(r.x).toBeCloseTo((1440 - r.w) / 2, 6)
     expect(r.w).toBeGreaterThan(1440)
   })
 
@@ -76,6 +90,8 @@ describe('toArt', () => {
 describe('restCss', () => {
   it('states the same cover rule in CSS', () => {
     const css = restCss()
+    expect(css.left).toContain(String(FOCUS_X))
+    expect(css.left).toContain('clamp(')
     expect(css.width).toContain('100vw')
     expect(css.width).toContain(`100vh * ${SCENE_ASPECT}`)
     expect(css.height).toContain(`/ ${SCENE_ASPECT}`)
