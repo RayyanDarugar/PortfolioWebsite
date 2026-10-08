@@ -20,8 +20,6 @@ import { Spotlight } from './Spotlight'
 import { Stacked } from './Stacked'
 import { Wallpaper } from './Wallpaper'
 import type { Box } from './chrome'
-import { Boot } from './boot/Boot'
-import { useBoot } from './boot/session'
 import { Laptop } from './intro/Laptop'
 import { Picker } from './picker/Picker'
 import { isDownwardWheel, isUpwardWheel } from './intro/geometry'
@@ -89,7 +87,6 @@ export function OS() {
   const wasOverlay = useRef(overlayOpen)
 
   const landed = zoom.phase === 'desktop'
-  const boot = useBoot(landed, view.app)
   const active = landed ? appIndex(view.app) : -1
   const frontmost = APPS[active]?.name ?? 'Finder'
   const spotlight = landed && spotlightAt === pathname
@@ -293,8 +290,6 @@ export function OS() {
             onHome={goHome}
             homeActive={!view.app}
           />
-
-          {boot.booting && <Boot reduced={reduced} onDone={boot.done} />}
         </Laptop>
 
         {/* The room's own chrome, faded out by the zoom. `inert` alone, not
