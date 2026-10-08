@@ -45,8 +45,10 @@ export function Picker({
                   // eslint-disable-next-line @next/next/no-img-element -- content media of unknown size
                   <img src={app.preview} alt="" className="h-full w-full object-cover" />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center" style={{ background: app.tile }}>
-                    <span className="block h-[38%] w-[38%]"><app.Glyph /></span>
+                  <span className="relative flex h-full w-full items-center justify-center overflow-hidden" style={{ background: app.tile }}>
+                    {/* The icon's own colour, softened, so the icon sits on it rather than in it. */}
+                    <span aria-hidden className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 38%, rgba(255,255,255,.28), rgba(0,0,0,.28))' }} />
+                    <span className="relative block h-[58%] aspect-square" style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,.35))' }}><app.Icon /></span>
                   </span>
                 )}
               </span>

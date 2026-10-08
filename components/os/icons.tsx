@@ -1,194 +1,288 @@
+'use client'
+import { useId, type ReactNode } from 'react'
+
 /**
- * Dock icon art. Each one is drawn rather than lettered, because a dock of
- * seven coloured squares with initials in them is the exact "design
- * prototype" register the rebuild is trying to leave behind.
+ * App icons, in the macOS style: each is a whole tile (a continuous-corner
+ * squircle lit from above, with a sheen and a rim) holding one object drawn
+ * with depth and a soft shadow. Pure SVG on a 100×100 grid, nothing to load.
  *
- * All seven are 24×24 viewBoxes so the tile can scale them as one, and all
- * seven are pure geometry — no external assets, nothing to fail to load.
+ * Every instance takes its own gradient and filter ids (`useId`): the dock and
+ * the picker show the same icon at once, and shared ids would let one copy
+ * paint with the other's definitions.
  */
 
-/** Ours: the free rectangle, outlined, with the ad seated inside it. The
- *  whole product in one glyph. */
-export function MarkGlyph() {
+/** The macOS icon shape: a squircle, not a rounded rectangle. */
+const TILE = 'M50 4C84.5 4 96 15.5 96 50S84.5 96 50 96 4 84.5 4 50 15.5 4 50 4Z'
+
+function useIconId(): string {
+  return `i${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+}
+
+/** Gradient stops as [offset, colour] pairs, top to bottom. */
+type Stops = readonly (readonly [number, string])[]
+
+function Grad({ id, stops, x2 = 0, y2 = 1 }: { id: string; stops: Stops; x2?: number; y2?: number }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <rect x="2.4" y="4.4" width="19.2" height="15.2" rx="2.4"
-            stroke="rgba(255,255,255,.95)" strokeWidth="1.7" strokeDasharray="3.1 2.3" />
-      <rect x="6.2" y="8.2" width="11.6" height="7.6" rx="1.5" fill="#fff" />
-      <rect x="7.9" y="10" width="8.2" height="1.5" rx=".75" fill="#5FAF00" />
-      <rect x="7.9" y="12.6" width="5.4" height="1.5" rx=".75" fill="#96D64B" />
+    <linearGradient id={id} x1="0" y1="0" x2={x2} y2={y2}>
+      {stops.map(([o, c]) => <stop key={o} offset={o} stopColor={c} />)}
+    </linearGradient>
+  )
+}
+
+/** The tile: background, sheen and rim around the object. `clip` keeps a
+ *  scene (the sunset) inside the tile's shape. */
+function Tile({ id, bg, defs, clip = false, children }: { id: string; bg: Stops; defs?: ReactNode; clip?: boolean; children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden>
+      <defs>
+        <Grad id={`${id}bg`} stops={bg} />
+        <linearGradient id={`${id}sheen`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".38" />
+          <stop offset=".46" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <filter id={`${id}drop`} x="-25%" y="-25%" width="150%" height="160%">
+          <feDropShadow dx="0" dy="2.4" stdDeviation="2.2" floodColor="#000" floodOpacity=".34" />
+        </filter>
+        <clipPath id={`${id}clip`}><path d={TILE} /></clipPath>
+        {defs}
+      </defs>
+      <path data-icon-tile d={TILE} fill={`url(#${id}bg)`} />
+      {clip ? <g clipPath={`url(#${id}clip)`}>{children}</g> : children}
+      <path d={TILE} fill={`url(#${id}sheen)`} pointerEvents="none" />
+      <path d={TILE} fill="none" stroke="rgba(255,255,255,.42)" strokeWidth=".9" />
+      <path d={TILE} fill="none" stroke="rgba(0,0,0,.22)" strokeWidth=".5" transform="translate(50 50) scale(1.006) translate(-50 -50)" />
     </svg>
   )
 }
 
-/** Activity Monitor: the trace. */
-export function PulseGlyph() {
+/** Mission Control: four windows spread on a slate desk. */
+export function MissionControlIcon() {
+  const id = useIconId()
+  const wins = [
+    { x: 15, y: 20, c: '#3B8CF2' }, { x: 52, y: 20, c: '#FF9F43' },
+    { x: 15, y: 53, c: '#34C77B' }, { x: 52, y: 53, c: '#A66CFF' },
+  ]
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <path d="M1.5 15.4h3.6l2-6.6 3 12 3.1-15 2.4 9.6h5.9"
-            stroke="#7BE000" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <Tile id={id} bg={[[0, '#68738A'], [1, '#222736']]} defs={<Grad id={`${id}w`} stops={[[0, '#FFFFFF'], [1, '#DCE3EC']]} />}>
+      {wins.map((w) => (
+        <g key={w.c} filter={`url(#${id}drop)`}>
+          <rect x={w.x} y={w.y} width="33" height="26" rx="3.6" fill={`url(#${id}w)`} />
+          <rect x={w.x} y={w.y} width="33" height="6" rx="3" fill="rgba(20,26,34,.12)" />
+          <rect x={w.x + 4} y={w.y + 10} width="25" height="11.5" rx="1.8" fill={w.c} />
+        </g>
+      ))}
+    </Tile>
   )
 }
 
-/** System Settings: the gear. Teeth generated from one loop so they are
- *  evenly spaced by construction rather than by eight hand-typed rects. */
-export function GearGlyph() {
-  const teeth = [0, 45, 90, 135, 180, 225, 270, 315]
+/** Résumé: a sheet with a header and lines, set slightly askew on blue. */
+export function ResumeIcon() {
+  const id = useIconId()
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <g fill="#fff">
-        {teeth.map((deg) => (
-          <rect key={deg} x="10.85" y="1.4" width="2.3" height="5.2" rx="1.1"
-                transform={`rotate(${deg} 12 12)`} />
+    <Tile
+      id={id}
+      bg={[[0, '#86C2FF'], [1, '#2C6BDF']]}
+      defs={(
+        <>
+          <Grad id={`${id}p`} stops={[[0, '#FFFFFF'], [1, '#E7ECF3']]} />
+          <Grad id={`${id}a`} stops={[[0, '#5AA8FF'], [1, '#1F5FD1']]} />
+        </>
+      )}
+    >
+      <g transform="rotate(-6 50 50)" filter={`url(#${id}drop)`}>
+        <path d="M27 14h36l11 11v61a3 3 0 0 1-3 3H27a3 3 0 0 1-3-3V17a3 3 0 0 1 3-3Z" fill={`url(#${id}p)`} />
+        <path d="M63 14v8a3 3 0 0 0 3 3h8Z" fill="#CDD6E2" />
+        <circle cx="35.5" cy="28" r="5.5" fill={`url(#${id}a)`} />
+        <rect x="44" y="24.5" width="17" height="3.4" rx="1.7" fill="#1C2430" />
+        <rect x="44" y="30" width="11" height="2.4" rx="1.2" fill="#9AA6B6" />
+        <rect x="30" y="40" width="38" height="2.6" rx="1.3" fill="#2E7FE0" />
+        {[46, 51, 56, 63, 68, 73, 78].map((y, i) => (
+          <rect key={y} x="30" y={y} width={[38, 34, 29, 38, 31, 36, 22][i]} height="2.2" rx="1.1" fill="#B7C1CE" />
         ))}
       </g>
-      <circle cx="12" cy="12" r="7.1" fill="#fff" />
-      <circle cx="12" cy="12" r="3.1" fill="#8A929C" />
-    </svg>
+    </Tile>
   )
 }
 
-/** Calculator: the keypad, with the operator column in Apple's orange. */
-export function KeypadGlyph() {
-  const cells = [0, 1, 2].flatMap((row) => [0, 1, 2].map((col) => ({ row, col })))
+/** Agent Dynamo: a glossy bolt with a glow behind it. */
+export function DynamoIcon() {
+  const id = useIconId()
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <rect x="3.6" y="2.6" width="16.8" height="4.4" rx="1.2" fill="rgba(255,255,255,.30)" />
-      <rect x="12.4" y="3.9" width="6.6" height="1.8" rx=".9" fill="#fff" />
-      {cells.map(({ row, col }) => (
-        <rect key={`${row}-${col}`} x={3.6 + col * 4.6} y={8.9 + row * 4.4}
-              width="3.6" height="3.4" rx="1" fill="rgba(255,255,255,.88)" />
+    <Tile
+      id={id}
+      bg={[[0, '#FFB44C'], [1, '#E2451B']]}
+      defs={(
+        <>
+          <radialGradient id={`${id}glow`}><stop offset="0" stopColor="#FFF6C8" stopOpacity=".7" /><stop offset="1" stopColor="#FFF6C8" stopOpacity="0" /></radialGradient>
+          <Grad id={`${id}b`} stops={[[0, '#FFF8C2'], [0.45, '#FFD43B'], [1, '#FF9A1A']]} x2={0.4} />
+        </>
+      )}
+    >
+      <circle cx="50" cy="50" r="34" fill={`url(#${id}glow)`} />
+      <path d="M58 11 27 55h19.5l-6 35L73 43H53.5l4.5-32Z" fill={`url(#${id}b)`} stroke="#A9460A" strokeWidth="1.8" strokeLinejoin="round" filter={`url(#${id}drop)`} />
+      <path d="M55.5 17.5 33 50.5" stroke="#fff" strokeOpacity=".75" strokeWidth="1.8" strokeLinecap="round" />
+    </Tile>
+  )
+}
+
+/** The TikTok platform: a phone playing something bright. Not TikTok's mark. */
+export function TikTokIcon() {
+  const id = useIconId()
+  return (
+    <Tile
+      id={id}
+      bg={[[0, '#3D4352'], [1, '#0C0E13']]}
+      defs={(
+        <>
+          <Grad id={`${id}body`} stops={[[0, '#F4F6F9'], [1, '#AEB6C2']]} />
+          <Grad id={`${id}scr`} stops={[[0, '#FF4F8E'], [0.5, '#7B5CFF'], [1, '#2DE0E6']]} x2={1} />
+        </>
+      )}
+    >
+      <g filter={`url(#${id}drop)`}>
+        <rect x="29" y="11" width="42" height="78" rx="9" fill={`url(#${id}body)`} />
+        <rect x="32.5" y="16" width="35" height="68" rx="5.6" fill={`url(#${id}scr)`} />
+        <rect x="44" y="12.8" width="12" height="1.8" rx=".9" fill="#7A828F" />
+      </g>
+      <path d="M45 39.5v21l17-10.5Z" fill="#fff" />
+      <path d="M61.5 70.6c-1.9-1.5-4-3.2-4-5 0-1.2.9-2.1 2-2.1.8 0 1.5.4 2 1.1.5-.7 1.2-1.1 2-1.1 1.1 0 2 .9 2 2.1 0 1.8-2.1 3.5-4 5Z" fill="#fff" />
+      {[0, 1, 2].map((i) => <rect key={i} x={36.5 + i * 5} y={77 - i * 3} width="3" height={3 + i * 3} rx="1" fill="#fff" fillOpacity=".85" />)}
+    </Tile>
+  )
+}
+
+/** The News Digest: a folded paper with a masthead, a photo and columns. */
+export function DigestIcon() {
+  const id = useIconId()
+  return (
+    <Tile
+      id={id}
+      bg={[[0, '#FCF7EC'], [1, '#D6C6A6']]}
+      defs={(
+        <>
+          <Grad id={`${id}p`} stops={[[0, '#FFFDF7'], [1, '#EEE6D4']]} />
+          <Grad id={`${id}ph`} stops={[[0, '#9CC2E3'], [1, '#4A77A3']]} />
+        </>
+      )}
+    >
+      <rect x="25" y="19" width="52" height="64" rx="2" fill="#E2D8C3" transform="rotate(5 51 51)" filter={`url(#${id}drop)`} />
+      <g filter={`url(#${id}drop)`}>
+        <rect x="23" y="15" width="54" height="66" rx="2.2" fill={`url(#${id}p)`} />
+      </g>
+      <rect x="28" y="20" width="44" height="8" rx="1" fill="#24201A" />
+      <rect x="28" y="30.5" width="44" height=".8" fill="#24201A" />
+      <rect x="28" y="34" width="44" height="3.6" rx="1" fill="#3A342B" />
+      <rect x="28" y="40" width="30" height="3.6" rx="1" fill="#3A342B" />
+      <rect x="28" y="47" width="20" height="17" rx="1" fill={`url(#${id}ph)`} />
+      <circle cx="42" cy="52" r="2.6" fill="#FFE29A" />
+      <path d="M28 64l7-7 5 5 3-3 5 5v0H28Z" fill="#2F5579" />
+      {[47, 51, 55, 59, 63].map((y) => <rect key={y} x="51.5" y={y} width="20.5" height="2" rx="1" fill="#A99F8D" />)}
+      {[68, 72, 76].map((y, i) => <rect key={y} x="28" y={y} width={[44, 40, 30][i]} height="2" rx="1" fill="#A99F8D" />)}
+    </Tile>
+  )
+}
+
+/** Experience: a leather briefcase with a brass clasp. */
+export function ExperienceIcon() {
+  const id = useIconId()
+  return (
+    <Tile
+      id={id}
+      bg={[[0, '#6AA8FF'], [1, '#2350C6']]}
+      defs={(
+        <>
+          <Grad id={`${id}l`} stops={[[0, '#D79A5A'], [1, '#7E4C1C']]} />
+          <Grad id={`${id}g`} stops={[[0, '#FFEAA8'], [1, '#C4952C']]} />
+        </>
+      )}
+    >
+      <path d="M39 31v-5.5a6 6 0 0 1 6-6h10a6 6 0 0 1 6 6V31" fill="none" stroke="#4E2D10" strokeWidth="4.6" />
+      <g filter={`url(#${id}drop)`}>
+        <rect x="16" y="30" width="68" height="50" rx="8" fill={`url(#${id}l)`} />
+      </g>
+      <path d="M16 50h68" stroke="#5E3814" strokeWidth="1.6" />
+      <rect x="19.5" y="33.5" width="61" height="43" rx="5.5" fill="none" stroke="rgba(255,226,180,.55)" strokeWidth=".9" strokeDasharray="2.2 1.8" />
+      <rect x="16" y="30" width="68" height="12" rx="8" fill="#fff" fillOpacity=".16" />
+      <rect x="44" y="45" width="12" height="10" rx="2" fill={`url(#${id}g)`} stroke="#7F5E13" strokeWidth=".9" />
+      <rect x="48.5" y="49" width="3" height="3" rx=".8" fill="#7F5E13" />
+    </Tile>
+  )
+}
+
+/** Videos: a clapperboard, its sticks open. */
+export function VideosIcon() {
+  const id = useIconId()
+  const stripes = [0, 1, 2, 3, 4]
+  return (
+    <Tile
+      id={id}
+      bg={[[0, '#555C6B'], [1, '#14161B']]}
+      defs={<Grad id={`${id}b`} stops={[[0, '#3A3E47'], [1, '#121418']]} />}
+    >
+      <g filter={`url(#${id}drop)`}>
+        <rect x="18" y="44" width="64" height="40" rx="4.5" fill={`url(#${id}b)`} />
+        <rect x="18" y="44" width="64" height="9" rx="2" fill="#F4F5F7" />
+        {stripes.map((i) => <path key={i} d={`M${21 + i * 13} 44h6.5l-5 9H${16 + i * 13}Z`} fill="#1B1D22" />)}
+        <g transform="rotate(-14 18 42)">
+          <rect x="18" y="31" width="64" height="9" rx="2" fill="#F4F5F7" />
+          {stripes.map((i) => <path key={i} d={`M${24 + i * 13} 31h6.5l-5 9H${19 + i * 13}Z`} fill="#1B1D22" />)}
+        </g>
+        <circle cx="20.5" cy="42.5" r="2.4" fill="#9AA1AD" />
+      </g>
+      <path d="M45 59v17l14-8.5Z" fill="#fff" fillOpacity=".92" />
+    </Tile>
+  )
+}
+
+/** About: the sun going down over the Pacific. */
+export function AboutIcon() {
+  const id = useIconId()
+  return (
+    <Tile
+      id={id}
+      clip
+      bg={[[0, '#FFD37A'], [0.55, '#FF8A4C'], [1, '#C9437A']]}
+      defs={(
+        <>
+          <radialGradient id={`${id}sun`}><stop offset="0" stopColor="#FFFBE2" /><stop offset=".7" stopColor="#FFD25A" /><stop offset="1" stopColor="#FFB23A" /></radialGradient>
+          <radialGradient id={`${id}halo`}><stop offset="0" stopColor="#FFF4C4" stopOpacity=".75" /><stop offset="1" stopColor="#FFF4C4" stopOpacity="0" /></radialGradient>
+          <Grad id={`${id}sea`} stops={[[0, '#6C8FE0'], [1, '#22357F']]} />
+        </>
+      )}
+    >
+      <circle cx="50" cy="60" r="34" fill={`url(#${id}halo)`} />
+      <circle cx="50" cy="60" r="19" fill={`url(#${id}sun)`} />
+      <rect x="0" y="60" width="100" height="40" fill={`url(#${id}sea)`} />
+      <rect x="0" y="60" width="100" height="1.2" fill="#FFE6A8" fillOpacity=".8" />
+      {[[36, 65, 28], [40, 70, 20], [44, 75, 12], [47, 80, 6]].map(([x, y, w]) => (
+        <rect key={y} x={x} y={y} width={w} height="1.8" rx=".9" fill="#FFD884" fillOpacity=".85" />
       ))}
-      <rect x="17.4" y="8.9" width="3" height="12.2" rx="1.3" fill="#FF9F0A" />
-    </svg>
+      <path d="M24 30q3-3 6 0q3-3 6 0M64 22q2.4-2.4 4.8 0q2.4-2.4 4.8 0" fill="none" stroke="#7A3A3A" strokeOpacity=".55" strokeWidth="1.2" strokeLinecap="round" />
+    </Tile>
   )
 }
 
-/** Stocks: the line, with the area under it filled. */
-export function ChartGlyph() {
+/** Contact: a sealed envelope with a stamp. */
+export function ContactIcon() {
+  const id = useIconId()
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <path d="M2.2 18.6 6.6 13.4 10.4 15.6 15 8.2 18.4 11 21.8 5.4V21H2.2Z"
-            fill="rgba(123,224,0,.30)" />
-      <path d="M2.2 18.6 6.6 13.4 10.4 15.6 15 8.2 18.4 11 21.8 5.4"
-            stroke="#7BE000" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="21.8" cy="5.4" r="2" fill="#7BE000" />
-    </svg>
-  )
-}
-
-/** Privacy & Security: the shield, with the keyhole cut out of it. */
-export function ShieldGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <path d="M12 1.8 21 5.4v6.1c0 5.6-4.4 9.2-9 10.7-4.6-1.5-9-5.1-9-10.7V5.4l9-3.6Z"
-            fill="#fff" />
-      <circle cx="12" cy="10.4" r="2.3" fill="#1B63C0" />
-      <path d="M10.9 11.6h2.2l.7 4.6h-3.6l.7-4.6Z" fill="#1B63C0" />
-    </svg>
-  )
-}
-
-/** Mail: the envelope. */
-export function MailGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <rect x="1.8" y="4.6" width="20.4" height="14.8" rx="2.6" fill="#fff" />
-      <path d="M3.4 7 12 13.3 20.6 7" stroke="#1B63C0" strokeWidth="1.9"
-            strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-/** A page with a header line: the Résumé app's tile. */
-export function DocGlyph() {
-  return (
-    <svg viewBox="0 0 40 40" className="h-full w-full" aria-hidden>
-      <path d="M10 4h14l8 8v22a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
-            fill="#FBFCFE" stroke="rgba(20,26,34,.35)" strokeWidth="1.2" />
-      <path d="M24 4l8 8h-8Z" fill="#D8DFE8" />
-      <rect x="12" y="17" width="16" height="2.4" rx="1.2" fill="#1B63C0" />
-      <rect x="12" y="22" width="16" height="2.4" rx="1.2" fill="rgba(20,26,34,.25)" />
-      <rect x="12" y="27" width="11" height="2.4" rx="1.2" fill="rgba(20,26,34,.25)" />
-    </svg>
-  )
-}
-
-/** A sun on the horizon: the About app, whose mission is beauty. */
-export function SunGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden fill="none"
-         stroke="#fff" strokeWidth="1.9" strokeLinecap="round">
-      <path d="M6.5 16a5.5 5.5 0 0 1 11 0" />
-      <path d="M3 19.5h18M12 5v2.4M5.2 8.6l1.7 1.7M18.8 8.6l-1.7 1.7M2.8 15.6h1.8M19.4 15.6h1.8" />
-    </svg>
-  )
-}
-
-/** A clapperboard: the Videos app. */
-export function FilmGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden>
-      <rect x="3" y="9" width="18" height="11.5" rx="2" fill="#fff" />
-      <path d="M3.4 8.2 20 4.6l.6 2.8L4 11Z" fill="#fff" />
-      <path d="M7.4 7.3 9.6 9.9M12 6.3l2.2 2.6M16.6 5.3l2.2 2.6" stroke="#2B2E34" strokeWidth="1.4" />
-      <path d="M10.3 12.6v5l4.4-2.5Z" fill="#2B2E34" />
-    </svg>
-  )
-}
-
-/** Agent Dynamo: a bolt. */
-export function BoltGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <path d="M13.6 2.5 5.2 13.4h5.6l-1.4 8.1 8.4-10.9h-5.6l1.4-8.1Z" fill="#fff" stroke="rgba(120,40,0,.35)" strokeWidth=".8" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-/** The TikTok platform: a phone playing something. Not TikTok's mark. */
-export function PhoneGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.4" stroke="#fff" strokeWidth="1.6" />
-      <path d="M10.4 9.2v5.6l4.6-2.8-4.6-2.8Z" fill="#FF3B6B" />
-      <rect x="10.2" y="18.2" width="3.6" height="1.2" rx=".6" fill="#fff" />
-    </svg>
-  )
-}
-
-/** The News Digest: a folded paper. */
-export function NewsGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <rect x="3.4" y="4.4" width="17.2" height="15.2" rx="1.6" fill="#fff" stroke="rgba(60,48,30,.45)" strokeWidth="1" />
-      <rect x="5.6" y="6.8" width="12.8" height="2.6" rx=".6" fill="#2B2620" />
-      <rect x="5.6" y="11" width="6" height="5.8" rx=".5" fill="#C9BFAE" />
-      {[11.4, 13.6, 15.8].map((y) => <rect key={y} x="12.8" y={y} width="5.6" height="1.1" rx=".55" fill="rgba(43,38,32,.55)" />)}
-    </svg>
-  )
-}
-
-/** Experience: a briefcase. */
-export function BriefcaseGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      <path d="M9 6.4V5a1.6 1.6 0 0 1 1.6-1.6h2.8A1.6 1.6 0 0 1 15 5v1.4" stroke="#fff" strokeWidth="1.6" />
-      <rect x="3" y="6.6" width="18" height="13" rx="2.2" fill="#fff" />
-      <path d="M3 12h18" stroke="#9A6A2E" strokeWidth="1.2" />
-      <rect x="10.6" y="10.8" width="2.8" height="2.6" rx=".6" fill="#9A6A2E" />
-    </svg>
-  )
-}
-
-/** Mission Control: four windows. */
-export function GridGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-full w-full">
-      {[[3, 4], [13, 4], [3, 13.4], [13, 13.4]].map(([x, y]) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width="8" height="6.6" rx="1.4" fill="#fff" fillOpacity=".92" />
-      ))}
-    </svg>
+    <Tile
+      id={id}
+      bg={[[0, '#72D0FF'], [1, '#1C74E6']]}
+      defs={(
+        <>
+          <Grad id={`${id}e`} stops={[[0, '#FFFFFF'], [1, '#DCE5F0']]} />
+          <Grad id={`${id}f`} stops={[[0, '#FFFFFF'], [1, '#EEF3F9']]} />
+        </>
+      )}
+    >
+      <g filter={`url(#${id}drop)`}>
+        <rect x="16" y="28" width="68" height="46" rx="5" fill={`url(#${id}e)`} />
+      </g>
+      <path d="M17.5 72 42 51M82.5 72 58 51" stroke="#C7D2E0" strokeWidth="1.4" />
+      <path d="M17 30.5 50 56l33-25.5" fill={`url(#${id}f)`} stroke="#C2CEDD" strokeWidth="1.4" strokeLinejoin="round" />
+      <rect x="66" y="33" width="11" height="13" rx="1" fill="#FF5A5F" />
+      <rect x="67.4" y="34.4" width="8.2" height="10.2" rx=".6" fill="none" stroke="#fff" strokeWidth=".8" strokeDasharray="1.4 1" />
+    </Tile>
   )
 }

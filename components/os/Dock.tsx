@@ -2,10 +2,13 @@
 import { motion } from 'framer-motion'
 import { useCallback, useEffect, useRef } from 'react'
 import { GLASS } from './chrome'
-import { GridGlyph } from './icons'
+import { MissionControlIcon } from './icons'
 import type { AppDef } from './registry'
 
 const TILE = 58
+
+/** Icons carry their own tile and lighting; the dock only sets them down. */
+const ICON_SHADOW = 'drop-shadow(0 2px 2px rgba(6,8,24,.35)) drop-shadow(0 8px 10px rgba(6,8,24,.35))'
 
 /**
  * Magnification. How far along the dock an icon still feels the pointer, how
@@ -197,8 +200,8 @@ export function Dock({
               >
                 Mission Control
               </span>
-              <span className="relative block" style={{ width: TILE, height: TILE, borderRadius: 15, padding: 12, background: 'linear-gradient(#5B6475,#2A3040)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.4), 0 10px 20px -6px rgba(6,8,24,.6)' }}>
-                <GridGlyph />
+              <span className="relative block" style={{ width: TILE, height: TILE, filter: ICON_SHADOW }}>
+                <MissionControlIcon />
               </span>
               <span aria-hidden className="mt-[5px] block h-[4px] w-[4px] rounded-full" style={{ background: '#fff', opacity: homeActive ? 1 : 0 }} />
             </button>
@@ -251,32 +254,12 @@ export function Dock({
                   <motion.span
                     ref={(el) => { registerTile(i, el) }}
                     className="relative block"
-                    style={{
-                      width: TILE, height: TILE, borderRadius: 15,
-                      background: app.tile,
-                      padding: app.inset,
-                      boxShadow: [
-                        'inset 0 1px 0 rgba(255,255,255,.55)',
-                        'inset 0 0 0 .5px rgba(255,255,255,.28)',
-                        '0 2px 3px rgba(6,8,24,.35)',
-                        '0 10px 20px -6px rgba(6,8,24,.6)',
-                      ].join(','),
-                    }}
+                    style={{ width: TILE, height: TILE, filter: ICON_SHADOW }}
                     initial={false}
                     animate={{ y: on ? [0, -17, 0] : 0 }}
                     transition={{ duration: 0.66, times: [0, 0.36, 1], ease: [0.28, 0.9, 0.32, 1] }}
                   >
-                    <app.Glyph />
-                    {/* The gloss. A real dock icon has a highlight across the
-                        top third; without it the tiles read as flat swatches. */}
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-x-[1px] top-[1px] h-[42%]"
-                      style={{
-                        borderRadius: '14px 14px 40% 40%',
-                        background: 'linear-gradient(rgba(255,255,255,.42),rgba(255,255,255,.04))',
-                      }}
-                    />
+                    <app.Icon />
                   </motion.span>
                 </span>
               </span>
