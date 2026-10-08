@@ -7,10 +7,18 @@ import { DocGlyph, FilmGlyph, MailGlyph, SunGlyph } from './icons'
 import type { WindowFrame } from './stage'
 import type { AppId } from './view'
 
-/** Everything an app window is handed. `onClose` is absent in the stacked
- *  fallback, where there is no desktop to close a window onto. */
+/** Everything an app window is handed. In the stacked fallback there is no
+ *  desktop, so none of these are passed: no close, no routing, never active. */
 export interface AppSceneProps {
   onClose?: () => void
+  /** The window is the one open on the desktop. Heavy media waits for this. */
+  active?: boolean
+  /** Experience's selected role, from the URL. */
+  sub?: string
+  /** Replace the URL without adding history (Experience's sidebar). */
+  onNavigate?: (path: string) => void
+  /** Open another app's window (a role's related project). */
+  onOpenApp?: (id: string) => void
 }
 
 export interface AppDef {
