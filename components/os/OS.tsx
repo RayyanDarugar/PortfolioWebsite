@@ -177,8 +177,8 @@ export function OS() {
         return
       }
       if (!landed || !isUpwardWheel(event.deltaY)) return
-      // Inside an open window the wheel scrolls the window, not the camera.
-      if (event.target instanceof Element && event.target.closest('[data-os-window]')) return
+      // Inside an open window, or the picker, the wheel scrolls it, not the camera.
+      if (event.target instanceof Element && event.target.closest('[data-os-window],[data-os-scroll]')) return
       fired = true
       go(pathFor(ROOM))
     }

@@ -16,6 +16,7 @@ export function Picker({
   return (
     <section
       aria-label="Mission Control"
+      data-os-scroll
       className="absolute inset-x-0 bottom-[118px] top-[34px] z-[40] overflow-y-auto px-[clamp(20px,4vw,64px)] py-[clamp(16px,2.4vh,30px)]"
       style={{ background: 'rgba(8,10,20,.42)', backdropFilter: 'blur(14px) saturate(1.2)', WebkitBackdropFilter: 'blur(14px) saturate(1.2)' }}
     >

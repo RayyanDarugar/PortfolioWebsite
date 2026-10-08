@@ -39,7 +39,7 @@ const ROLE_EXTRAS: readonly RoleExtra[] = [
   { slug: 'btg', org: 'USC Business Technology Group', orgLine: 'A USC student consultancy working with tech companies.', tags: ['product'] },
   { slug: 'hemut', org: 'Hemut (YC X25)', orgLine: 'A Y Combinator (X25) startup.', tags: ['engineering'] },
   { slug: 'supervisor', org: 'Office of Supervisor Joel Anderson', orgLine: 'The District 2 office of San Diego Supervisor Joel Anderson.', tags: ['leadership'] },
-  { slug: 'deca', org: 'California DECA', orgLine: 'California’s chapter of DECA, the high-school business and marketing organization.', tags: ['leadership'] },
+  { slug: 'deca', org: 'California DECA', orgLine: 'The California association of DECA, the high-school business and marketing organization.', tags: ['leadership'] },
 ]
 
 type Resume = Pick<typeof RESUME, 'experience' | 'leadership'>

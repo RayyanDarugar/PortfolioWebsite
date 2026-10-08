@@ -53,13 +53,21 @@ function BrowserFrame({ url, media, live }: { url?: string; media: ProjectMedia;
 export function ProjectApp({ project: p, onClose, active }: AppSceneProps & { project: Project }) {
   const reduced = useReducedMotion()
   const [shown, setShown] = useState<number | null>(null)
+  // Windows stay mounted when closed: a lightbox left open would outlive its
+  // window and keep catching Esc, so closing the window closes it.
+  const [wasActive, setWasActive] = useState(active)
+  if (active !== wasActive) {
+    setWasActive(active)
+    if (!active) setShown(null)
+  }
   const closeLightbox = useCallback(() => setShown(null), [])
   const meta = [p.role, p.dates].filter(Boolean).join(' · ')
   const works = (p.stack && p.stack.length > 0) || p.diagram
 
   return (
     <OSWindow title={p.name} subtitle={p.displayUrl ?? 'Project'} onClose={onClose}>
-      <div className="relative h-full overflow-y-auto p-[clamp(24px,2.6vw,42px)]">
+      <div className="relative h-full">
+      <div className="h-full overflow-y-auto p-[clamp(24px,2.6vw,42px)]">
         <div className={`grid items-center gap-[clamp(20px,2.4vw,36px)] ${p.hero ? 'lg:grid-cols-[1.25fr_1fr]' : ''}`}>
           {p.hero && <BrowserFrame url={p.displayUrl} media={p.hero} live={Boolean(active) && !reduced} />}
           <div>
@@ -119,7 +127,9 @@ export function ProjectApp({ project: p, onClose, active }: AppSceneProps & { pr
 
         {p.next && <Section title="What’s next"><Prose paragraphs={p.next} /></Section>}
 
-        {shown !== null && p.gallery && <Lightbox items={p.gallery} index={shown} onClose={closeLightbox} />}
+      </div>
+      {/* Outside the scroller, so it covers the window wherever it is scrolled. */}
+      {shown !== null && p.gallery && <Lightbox items={p.gallery} index={shown} onClose={closeLightbox} />}
       </div>
     </OSWindow>
   )

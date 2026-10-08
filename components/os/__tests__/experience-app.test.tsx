@@ -41,3 +41,12 @@ describe('ExperienceApp', () => {
     expect(onOpenApp).toHaveBeenCalledWith('tiktok')
   })
 })
+
+// The stacked fallback is phone width: a 220px sidebar left the detail ~80px.
+describe('Experience on a small screen', () => {
+  it('stacks the list over the detail where there is no desktop', () => {
+    const { container } = render(<ExperienceApp />)
+    expect(container.querySelector('.grid-cols-1')).not.toBeNull()
+    expect(container.innerHTML).not.toContain('grid-cols-[minmax(220px,30%)_1fr]')
+  })
+})

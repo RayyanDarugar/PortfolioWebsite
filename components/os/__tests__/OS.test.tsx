@@ -294,7 +294,7 @@ describe('the revamped laptop', () => {
 
   it('serves a project and a role with their text in the HTML', () => {
     at('/work/dynamo')
-    expect(renderToString(<OS />)).toContain('MIT reports that 95%')
+    expect(renderToString(<OS />)).toContain('An MIT study found that 95%')
     at('/work/experience/kana')
     // The Résumé also carries Kana's bullets; the h2 is Experience's alone.
     expect(renderToString(<OS />)).toMatch(/<h2[^>]*>Kana<\/h2>/)
@@ -331,5 +331,17 @@ describe('the picker', () => {
     nav.push.mockClear()
     fireEvent.keyDown(window, { key: 'F3' })
     expect(nav.push).toHaveBeenCalledWith('/work', PUSH_OPTS)
+  })
+})
+
+// On a 1280×800 MacBook the picker scrolls; scrolling back up inside it must
+// scroll it, not fly the camera out to the room.
+describe('scrolling the picker', () => {
+  it('scrolls the picker instead of leaving the laptop', () => {
+    at('/work')
+    render(<OS />)
+    const picker = screen.getByRole('region', { name: 'Mission Control' })
+    fireEvent.wheel(within(picker).getByRole('button', { name: /^Contact/ }), { deltaY: -40 })
+    expect(nav.push).not.toHaveBeenCalled()
   })
 })

@@ -84,7 +84,8 @@ export function ExperienceApp({ onClose, sub, onNavigate, onOpenApp }: AppSceneP
 
   return (
     <OSWindow title="Experience" subtitle={`${ROLES.length} roles`} onClose={onClose}>
-      <div className="grid h-full grid-cols-[minmax(220px,30%)_1fr]">
+      {/* Side by side on the desktop; stacked in the small-screen fallback. */}
+      <div className={`grid h-full ${onNavigate ? 'grid-cols-[minmax(220px,30%)_1fr]' : 'grid-cols-1'}`}>
         <aside className="flex h-full flex-col overflow-y-auto" style={{ background: 'rgba(232,236,241,.7)', borderRight: '1px solid rgba(20,26,34,.1)' }}>
           <div className="flex flex-wrap gap-[4px] p-[10px]" role="group" aria-label="Filter">
             {FILTERS.map((f) => (

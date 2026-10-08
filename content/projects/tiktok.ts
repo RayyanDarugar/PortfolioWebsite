@@ -15,6 +15,6 @@ export const TIKTOK: Project = {
     { value: '~600', label: 'engagements in a week' },
   ],
   built: [
-    'Built and shipped at super{set}: a platform that runs B2C social marketing on TikTok end to end, with no one in the loop.',
+    'Built and shipped at super{set}: a fully automated platform that runs B2C social marketing on TikTok.',
   ],
 }

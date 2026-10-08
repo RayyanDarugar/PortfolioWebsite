@@ -23,3 +23,9 @@ describe('the roles', () => {
     expect(() => joinRoles([{ slug: 'kana', org: 'Kana', tags: [], project: 'nope' }])).toThrow(/nope/)
   })
 })
+
+describe('org lines', () => {
+  it('call California DECA an association, not a chapter (chapters are schools)', () => {
+    expect(getRole('deca')!.orgLine).not.toMatch(/chapter/)
+  })
+})

@@ -33,3 +33,12 @@ describe('validateProjects', () => {
     expect(() => validateProjects([base, { ...base, order: 2 }])).toThrow(/duplicate/)
   })
 })
+
+// Recruiter-facing claims stay within their sources: the MIT study measured
+// return on generative-AI pilots, not losses.
+describe('claims', () => {
+  it('cite the MIT study for what it found, and nothing unproven', () => {
+    const text = PROJECTS.flatMap((p) => [...(p.problem ?? []), ...(p.built ?? [])]).join(' ')
+    expect(text).not.toMatch(/billion lost|high chance|no one in the loop/)
+  })
+})

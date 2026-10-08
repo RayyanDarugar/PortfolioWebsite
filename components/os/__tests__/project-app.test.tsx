@@ -55,3 +55,23 @@ describe('ProjectApp', () => {
     window.removeEventListener('keydown', outer)
   })
 })
+
+describe('the lightbox, in a real window', () => {
+  // The window body scrolls; a lightbox inside the scroller sat on its first
+  // screen, out of view once the gallery was scrolled to.
+  it('opens over the window, outside the part that scrolls', () => {
+    render(<ProjectApp project={full} active />)
+    fireEvent.click(screen.getByRole('button', { name: /The dashboard/ }))
+    expect(screen.getByRole('dialog').closest('.overflow-y-auto')).toBeNull()
+  })
+
+  // Windows stay mounted when closed; a lightbox left open kept catching Esc.
+  it('goes away with its window', () => {
+    const { rerender } = render(<ProjectApp project={full} active />)
+    fireEvent.click(screen.getByRole('button', { name: /The dashboard/ }))
+    rerender(<ProjectApp project={full} active={false} />)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    rerender(<ProjectApp project={full} active />)
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+})
