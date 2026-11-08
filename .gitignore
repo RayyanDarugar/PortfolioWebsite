@@ -10,3 +10,6 @@ next-env.d.ts
 docs/mockups/masters/rejects/
 rayyan-stuff/
 docs/mockups/ui/rejects/
+
+# static export output
+/out/
