@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { cardPath } from '@/components/os/view'
 
 export interface CardView {
@@ -33,6 +33,9 @@ const place = ([x0, y0, x1, y1]: readonly number[]) => ({
 })
 
 const SWIPE = 50 // px
+/** The story's type size, in cqw of the card: the design size, and the floor. */
+const BODY_MAX = 3.9
+const BODY_MIN = 3.1
 
 /**
  * One trading-card frame for every game card (spec §4): photo, name, type tag,
@@ -44,6 +47,24 @@ export function GameCard({ card, prev, next }: { card: CardView; prev: string | 
   const router = useRouter()
   const start = useRef<number | null>(null)
   const go = (id: string | null) => { if (id) router.replace(cardPath(id), { scroll: false }) }
+
+  // The story panel is a fixed window in the frame art. A longer story steps
+  // its type down until it fits, to a floor that stays readable; past that
+  // the panel scrolls. Sizes are in cqw, so one fit holds at every card width.
+  const panel = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const el = panel.current
+    if (!el) return
+    const fit = () => {
+      for (let size = BODY_MAX; size >= BODY_MIN - 0.001; size -= 0.1) {
+        el.style.setProperty('--body-size', `${size.toFixed(1)}cqw`)
+        if (el.scrollHeight <= el.clientHeight + 1) return
+      }
+    }
+    fit()
+    // The UI face can arrive after first paint and reflow the text.
+    document.fonts?.ready.then(fit).catch(() => {})
+  }, [card.body])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -79,12 +100,12 @@ export function GameCard({ card, prev, next }: { card: CardView; prev: string | 
         >
           {card.title}
         </h2>
-        <div className="absolute overflow-y-auto px-[5cqw] py-[3.4cqw]" style={place(FRAME.text)}>
+        <div ref={panel} className="absolute overflow-y-auto px-[5cqw] py-[3.4cqw]" style={place(FRAME.text)}>
           <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '2.8cqw', letterSpacing: '.12em', color: '#8a5a2b' }}>
             {card.tag}
           </p>
           {card.body.map((paragraph) => (
-            <p key={paragraph} className="mt-[2cqw]" style={{ fontFamily: 'var(--font-ui)', fontSize: '3.9cqw', lineHeight: 1.4, color: '#3a2a1c' }}>
+            <p key={paragraph} className="mt-[2cqw]" style={{ fontFamily: 'var(--font-ui)', fontSize: `var(--body-size, ${BODY_MAX}cqw)`, lineHeight: 1.4, color: '#3a2a1c' }}>
               {paragraph}
             </p>
           ))}

@@ -5,8 +5,8 @@ import { GameCard } from './GameCard'
 
 const LINE = {
   day: 'Sun up over the Pacific.',
-  sunset: 'Golden hour. The best part of the day.',
-  night: 'Dark out, city lights along the water.',
+  sunset: 'My favorite golden skies',
+  night: 'Nighttime waves',
 } as const
 
 /** The window's card (spec §4): San Diego right now, in its own light. The
@@ -22,7 +22,7 @@ export function SanDiegoCard() {
         title: 'San Diego',
         photo,
         stat: now ? `${sanDiegoClock(now)} in San Diego` : undefined,
-        body: now ? ['Where I am, right now.', LINE[variant]] : ['Where I am, right now.'],
+        body: now ? ['Home as seen from my window', LINE[variant]] : ['Home as seen from my window'],
       }}
       prev={null}
       next={null}

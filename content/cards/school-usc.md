@@ -6,4 +6,4 @@ stat: GPA 3.96
 set: schools
 order: 1
 ---
-The first of three schools in the World Bachelor in Business, and where it started: a B.S. in Business Administration at USC in Los Angeles.
+Fight On! My first year of college in the World Bachelor of Business Program - the best year of my life so far. Shout out to learning about startups and consulting in BTG and TroyLabs, and to PizzaMan for late night eats

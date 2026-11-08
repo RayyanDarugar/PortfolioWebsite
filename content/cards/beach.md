@@ -3,4 +3,4 @@ tag: PLACE · SAN DIEGO
 title: Home
 photo: /room/sprites/photo-beach.webp
 ---
-San Diego. Where I grew up, and where I learned to surf and boogie board.
+Home sweet home! From $1.25 fish tacos to Balboa Park to my favorite beaches, it's still my favorite city

@@ -5,4 +5,4 @@ lon: -117.1611
 date: Home
 photo: /room/sprites/globe.webp
 ---
-Home. Where I grew up, surfed, and learned to boogie board.
+Home sweet home. Still my favorite city - can't beat 73 degrees Fahrenheit all year round

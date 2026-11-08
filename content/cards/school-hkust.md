@@ -1,8 +1,8 @@
 ---
-tag: SCHOOL · HKUST · 2025
+tag: SCHOOL · HKUST · 2026
 title: HKUST
 photo: /room/sprites/flags.webp
 set: schools
 order: 2
 ---
-The second stop: a Bachelor of Business Administration at the Hong Kong University of Science and Technology.
+Where I am now: the second stop in the World Bachelor of Business Program - getting my B.S. in Business in Hong Kong, growing obsessed with the MTR system, and traveling all across Asia

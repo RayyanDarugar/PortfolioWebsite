@@ -5,4 +5,4 @@ photo: /room/sprites/flags.webp
 set: schools
 order: 3
 ---
-The third stop: a B.S. in Business at Bocconi University in Milan.
+Next year's stop - where I'll learn to live like an Italian at Bocconi while I pursue my closing years of my Bachelors in Business Admin.

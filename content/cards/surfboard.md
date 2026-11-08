@@ -1,6 +1,6 @@
 ---
-tag: GEAR · TWIN-FIN FISH
+tag: SURFBOARD
 title: The board
 photo: /room/sprites/surfboard.webp
 ---
-A short fish with a swallow tail, built for the San Diego breaks.
+The last gift my parents got me before college. Bonus points for coming from a charity auction supporting Pakistani Youth education (www.dil.org), and probably the coolest thing I own
