@@ -1,9 +1,11 @@
 /**
  * The videography portfolio.
  *
- * TEMPORARY HOSTING: these files live on the current rayyandarugar.com, which
- * this site replaces. They have to move (Vercel Blob, YouTube or Vimeo) before
- * the domain switch, or every link here breaks.
+ * TEMPORARY HOSTING: these files live in the old site's repo
+ * (RayyanDarugar/RayyanWebsite, gh-pages branch), served by GitHub Pages at
+ * its github.io address. Deleting, renaming or privatising that repo, or
+ * giving it a custom domain again, breaks every link here. Move them to
+ * YouTube, Vimeo or Vercel Blob when the site moves to Vercel.
  */
 
 export interface Video {
@@ -13,7 +15,7 @@ export interface Video {
   note: string
 }
 
-const OLD_SITE = 'https://rayyandarugar.com/videos'
+const OLD_SITE = 'https://rayyandarugar.github.io/RayyanWebsite/videos'
 
 export const VIDEOS: readonly Video[] = [
   { title: 'Homecoming 2024', src: `${OLD_SITE}/HOMECOMING_FINAL.mp4`, note: 'Del Norte High School' },
