@@ -15,7 +15,7 @@ export interface CardView {
 }
 
 /** The frame's transparent photo window and cream panels, in px of
- *  public/ui/card-frame.png (720 × 1099), measured from the file. */
+ *  public/ui/card-frame.webp (720 × 1099), measured from the file. */
 export const FRAME = {
   w: 720,
   h: 1099,
@@ -72,7 +72,7 @@ export function GameCard({ card, prev, next }: { card: CardView; prev: string | 
         <div className="absolute overflow-hidden bg-[#1f160f]" style={place(FRAME.photo)}>
           <Image src={card.photo} alt="" fill sizes="380px" className="object-contain p-[6%]" style={{ imageRendering: 'pixelated' }} />
         </div>
-        <Image src="/ui/card-frame.png" alt="" fill sizes="380px" priority className="pointer-events-none" />
+        <Image src="/ui/card-frame.webp" alt="" fill sizes="380px" priority className="pointer-events-none" />
         <h2
           className="absolute flex items-center justify-center px-[4cqw] text-center"
           style={{ ...place(FRAME.banner), fontFamily: 'var(--font-pixel)', fontSize: '4.6cqw', color: '#2a1a0e' }}

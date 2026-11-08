@@ -13,7 +13,7 @@
 export type Phase = 'room' | 'desktop'
 
 /**
- * Where the black screen rectangle sits inside `public/room/sunset.png`, as
+ * Where the black screen rectangle sits inside `public/room/sunset.webp`, as
  * fractions of the image: pixels 957–1225 × 576–738 of 2688 × 1152.
  * Measured from the file (the largest connected near-black region on the
  * laptop), not estimated, and pinned by `__tests__/screen-art.test.ts`, which

@@ -6,7 +6,7 @@ export function RoomBackdrop() {
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
       <Image
-        src="/room/base.png"
+        src="/room/backdrop.webp"
         alt=""
         fill
         sizes="40vw"

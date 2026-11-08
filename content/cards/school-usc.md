@@ -1,7 +1,7 @@
 ---
 tag: SCHOOL · USC · LOS ANGELES
 title: USC
-photo: /room/sprites/flags.png
+photo: /room/sprites/flags.webp
 stat: GPA 3.96
 set: schools
 order: 1

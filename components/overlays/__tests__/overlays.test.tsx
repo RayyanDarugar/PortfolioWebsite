@@ -15,7 +15,7 @@ import { Overlay } from '../Overlay'
 import { markOverlayOpenedInApp } from '../history'
 
 const card: CardView = {
-  id: 'school-hkust', tag: 'SCHOOL · HKUST · 2025', title: 'HKUST', photo: '/room/sprites/flags.png',
+  id: 'school-hkust', tag: 'SCHOOL · HKUST · 2025', title: 'HKUST', photo: '/room/sprites/flags.webp',
   stat: 'GPA 3.96', body: ['The second stop.', 'Hong Kong.'],
 }
 

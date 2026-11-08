@@ -56,11 +56,29 @@ export function RoomScene({
   onActivate: (id: string) => void
   children?: ReactNode
   /** The lighting. There are no day or night base layers, so those use their
-   *  full picture as the base, with their own sprites on top (identical pixels). */
-  variant?: Variant
+   *  full picture as the base, with their own sprites on top (identical pixels).
+   *  `null` while it is not yet known (the server and the first client
+   *  render): no art is drawn, so a visitor at night never downloads the
+   *  sunset set only to throw it away. */
+  variant?: Variant | null
 }) {
   const [map, setMap] = useState<HitMap | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
+
+  // The room fades in once its first set of art has loaded, rather than
+  // assembling itself layer by layer. It stays shown after that: a later
+  // change of lighting swaps the pictures under it. The timeout is a floor so
+  // a stalled image can never leave the room blank.
+  const layers = 1 + sprites.sprites.length
+  const [loaded, setLoaded] = useState(0)
+  const [revealed, setRevealed] = useState(false)
+  const onLayerLoad = () => setLoaded((n) => n + 1)
+  useEffect(() => { if (loaded >= layers) setRevealed(true) }, [loaded, layers])
+  useEffect(() => {
+    if (!variant) return
+    const id = window.setTimeout(() => setRevealed(true), 4000)
+    return () => window.clearTimeout(id)
+  }, [variant])
 
   useEffect(() => {
     let alive = true
@@ -92,24 +110,34 @@ export function RoomScene({
         if (id) onActivate(id)
       }}
     >
-      <Image src={variant === 'sunset' ? '/room/base.png' : `/room/${variant}.png`} alt="" fill priority sizes="112vw" style={PIXELATED} />
+      <div
+        className="absolute inset-0"
+        data-room-art={revealed ? 'shown' : 'loading'}
+        style={{ opacity: revealed ? 1 : 0, transition: 'opacity .5s ease-out' }}
+      >
+        {variant && (
+          <Image src={variant === 'sunset' ? '/room/base.webp' : `/room/${variant}.webp`} alt="" fill priority sizes="112vw" style={PIXELATED} onLoad={onLayerLoad} />
+        )}
 
-      {sprites.sprites.map((s) => (
-        <Image
-          key={s.id}
-          src={variant === 'sunset' ? `/room/sprites/${s.id}.png` : `/room/sprites/${s.id}.${variant}.png`}
-          alt=""
-          width={s.w}
-          height={s.h}
-          sizes={`${((s.w / SCENE_PX_W) * 112).toFixed(1)}vw`}
-          data-sprite={s.id}
-          data-lit={isLit(s.id) ? 'true' : 'false'}
-          className="room-sprite pointer-events-none absolute max-w-none"
-          style={{ ...boxOf(s), ...PIXELATED }}
-        />
-      ))}
+        {variant && sprites.sprites.map((s) => (
+          <Image
+            key={s.id}
+            src={variant === 'sunset' ? `/room/sprites/${s.id}.webp` : `/room/sprites/${s.id}.${variant}.webp`}
+            alt=""
+            width={s.w}
+            height={s.h}
+            priority
+            sizes={`${((s.w / SCENE_PX_W) * 112).toFixed(1)}vw`}
+            data-sprite={s.id}
+            data-lit={isLit(s.id) ? 'true' : 'false'}
+            className="room-sprite pointer-events-none absolute max-w-none"
+            style={{ ...boxOf(s), ...PIXELATED }}
+            onLoad={onLayerLoad}
+          />
+        ))}
 
-      {children}
+        {children}
+      </div>
 
       {ROOM_OBJECTS.map((o) => (
         <button

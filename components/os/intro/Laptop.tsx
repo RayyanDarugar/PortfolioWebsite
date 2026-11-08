@@ -8,10 +8,10 @@ import type { Zoom } from './useZoom'
 
 /** The room, flattened (the master art). If it changes, re-measure
  *  `SCREEN_L/T/R/B` in geometry.ts; `screen-art.test.ts` fails until you do. */
-export const SCENE_SRC = '/room/sunset.png'
+export const SCENE_SRC = '/room/sunset.webp'
 /** The desktop drawn in the room's own pixel style, shown until the live one
  *  is large enough to read. */
-export const SCREEN_PIXEL_SRC = '/hero/screen-pixel.png'
+export const SCREEN_PIXEL_SRC = '/hero/screen-pixel.webp'
 
 const PIXELATED = { imageRendering: 'pixelated' } as const
 

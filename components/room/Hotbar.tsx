@@ -46,9 +46,9 @@ export function Hotbar({
                 className="group relative flex w-[68px] flex-col items-center gap-[5px] outline-none"
               >
                 <span className="relative block h-[58px] w-[58px]">
-                  <Image src="/ui/hotbar-slot.png" alt="" fill sizes="58px" style={{ imageRendering: 'pixelated' }} />
+                  <Image src="/ui/hotbar-slot.webp" alt="" fill sizes="58px" style={{ imageRendering: 'pixelated' }} />
                   <Image
-                    src={`/room/sprites/${s.id}.png`}
+                    src={`/room/icons/${s.id}.webp`}
                     alt=""
                     width={36}
                     height={36}
@@ -56,7 +56,7 @@ export function Hotbar({
                     style={{ imageRendering: 'pixelated' }}
                   />
                   <Image
-                    src="/ui/hotbar-selected.png"
+                    src="/ui/hotbar-selected.webp"
                     alt=""
                     width={66}
                     height={66}

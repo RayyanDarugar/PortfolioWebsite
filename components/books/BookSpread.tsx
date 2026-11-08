@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import type { Book } from '@/content/books'
 import { reviewPages } from '@/content/reviewPages'
 
-/** The spread's two pages, px of public/ui/book-spread.png (1400 × 906), measured from the file. */
+/** The spread's two pages, px of public/ui/book-spread.webp (1400 × 906), measured from the file. */
 const LEFT = [102, 30, 667, 719] as const
 const RIGHT = [734, 30, 1297, 719] as const
 const place = ([x0, y0, x1, y1]: readonly number[]) => ({
@@ -41,7 +41,7 @@ export function BookSpread({ book }: { book: Book }) {
 
   return (
     <article className="relative w-[min(900px,92vw)] [container-type:inline-size]" style={{ aspectRatio: '1400 / 906' }}>
-      <Image src="/ui/book-spread.png" alt="" fill sizes="900px" priority className="pointer-events-none" />
+      <Image src="/ui/book-spread.webp" alt="" fill sizes="900px" priority className="pointer-events-none" />
 
       <div className="absolute flex flex-col items-center justify-center gap-[2cqw] px-[3cqw] text-center" style={place(LEFT)}>
         <div className="flex aspect-[2/3] w-[46%] flex-col items-center justify-center rounded-[4px] p-[1.5cqw]" style={{ background: book.special === 'percy' ? 'linear-gradient(#1f6f6b,#14504d)' : book.spine, boxShadow: 'inset 0 0 0 4px rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.3)' }}>

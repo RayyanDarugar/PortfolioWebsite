@@ -30,7 +30,7 @@ export function getPlaces(): Place[] {
       lat: data.lat,
       lon: data.lon,
       date: String(data.date ?? ''),
-      photo: typeof data.photo === 'string' ? data.photo : '/room/sprites/globe.png',
+      photo: typeof data.photo === 'string' ? data.photo : '/room/sprites/globe.webp',
       story: content.trim().split(/\n\s*\n/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean),
     }
   })

@@ -85,7 +85,7 @@ export function Globe({ places }: { places: readonly { slug: string; name: strin
               className="group absolute -translate-x-1/2 -translate-y-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ffd36e]"
               style={{ left: `${(pin.x / SIZE) * 100}%`, top: `${(pin.y / SIZE) * 100}%` }}
             >
-              <Image src="/ui/globe-pin.png" alt="" width={22} height={36} style={{ imageRendering: 'pixelated' }} />
+              <Image src="/ui/globe-pin.webp" alt="" width={22} height={36} style={{ imageRendering: 'pixelated' }} />
               <span className="pointer-events-none absolute bottom-full left-1/2 mb-[4px] -translate-x-1/2 whitespace-nowrap rounded-[3px] bg-[rgba(28,18,12,.9)] px-[6px] py-[2px] text-[11px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100" style={{ fontFamily: 'var(--font-pixel)' }}>
                 {p.name}
               </span>

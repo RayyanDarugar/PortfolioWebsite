@@ -1,7 +1,7 @@
 ---
 tag: SCHOOL · BOCCONI · MILAN
 title: Bocconi
-photo: /room/sprites/flags.png
+photo: /room/sprites/flags.webp
 set: schools
 order: 3
 ---

@@ -13,7 +13,7 @@ const LINE = {
  *  server and first render show the timeless line; the clock arrives after. */
 export function SanDiegoCard() {
   const { variant, now } = useTimeOfDay()
-  const photo = variant === 'sunset' ? '/room/sprites/window.png' : `/room/sprites/window.${variant}.png`
+  const photo = variant === 'sunset' ? '/room/sprites/window.webp' : `/room/sprites/window.${variant}.webp`
   return (
     <GameCard
       card={{

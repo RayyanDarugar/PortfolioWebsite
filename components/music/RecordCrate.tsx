@@ -4,7 +4,7 @@ import type { Track } from '@/content/records'
 import { useNowPlaying } from './NowPlaying'
 
 const PIXELATED = { imageRendering: 'pixelated' } as const
-/** The sleeve's transparent art window, % of record-sleeve.png (512 × 504). */
+/** The sleeve's transparent art window, % of record-sleeve.webp (512 × 504). */
 const WINDOW = { left: '17.8%', top: '15.7%', width: '63.9%', height: '67.7%' }
 const PIXEL_TEXT = { fontFamily: 'var(--font-pixel)' }
 
@@ -24,7 +24,7 @@ export function RecordCrate({ records }: { records: readonly Track[] }) {
 
       <div data-testid="platter" className="flex items-center gap-[18px] rounded-[14px] px-[20px] py-[14px]" style={{ background: 'rgba(22,14,9,.75)', border: '1px solid rgba(255,214,140,.22)' }}>
         <div className="relative h-[120px] w-[120px]">
-          <Image src="/ui/vinyl.png" alt="" fill sizes="120px" className={current && playing ? 'vinyl-spin' : ''} style={PIXELATED} />
+          <Image src="/ui/vinyl.webp" alt="" fill sizes="120px" className={current && playing ? 'vinyl-spin' : ''} style={PIXELATED} />
           {current && (
             <Image src={current.art} alt="" width={40} height={40} className={`absolute left-[40px] top-[40px] h-[40px] w-[40px] rounded-full ${playing ? 'vinyl-spin' : ''}`} style={PIXELATED} />
           )}
@@ -68,7 +68,7 @@ export function RecordCrate({ records }: { records: readonly Track[] }) {
                 <span className="absolute overflow-hidden bg-[#1f160f]" style={WINDOW}>
                   <Image src={r.art} alt="" fill sizes="100px" style={PIXELATED} />
                 </span>
-                <Image src="/ui/record-sleeve.png" alt="" fill sizes="152px" className="pointer-events-none" style={PIXELATED} />
+                <Image src="/ui/record-sleeve.webp" alt="" fill sizes="152px" className="pointer-events-none" style={PIXELATED} />
               </button>
             </li>
           )

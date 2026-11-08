@@ -1,7 +1,7 @@
 ---
 tag: SCHOOL · HKUST · 2025
 title: HKUST
-photo: /room/sprites/flags.png
+photo: /room/sprites/flags.webp
 set: schools
 order: 2
 ---

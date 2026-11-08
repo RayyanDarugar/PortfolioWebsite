@@ -69,7 +69,9 @@ export function OS() {
   const view = viewFromPath(pathname) ?? ROOM
   const overlayOpen = isRoomOverlay(pathname)
   const reduced = useReducedMotion()
-  const { variant } = useTimeOfDay()
+  const { variant, now } = useTimeOfDay()
+  // No lighting until the clock is read: see RoomScene's `variant`.
+  const roomVariant = now ? variant : null
 
   const panTarget = useMotionValue(0)
   const panSpring = useSpring(panTarget, { stiffness: 140, damping: 26, mass: 0.6 })
@@ -243,8 +245,8 @@ export function OS() {
           inert={!landed}
           live={landed}
           room={(
-            <RoomScene lit={lit} disabled={!roomActive} onActivate={activate} variant={variant}>
-              <WhiteboardIntro variant={variant} />
+            <RoomScene lit={lit} disabled={!roomActive} onActivate={activate} variant={roomVariant}>
+              <WhiteboardIntro variant={roomVariant ?? undefined} />
             </RoomScene>
           )}
         >

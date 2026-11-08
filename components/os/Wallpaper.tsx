@@ -3,10 +3,10 @@ import { GRAIN } from './chrome'
 
 /**
  * The desktop picture. **Swap this one line to change the wallpaper** —
- * `/wallpaper/wall-a.png` is the alternate. Nothing else in the tree names a
+ * `/wallpaper/wall-a.webp` is the alternate. Nothing else in the tree names a
  * file, so there is no second place to forget.
  */
-export const WALLPAPER_SRC = '/wallpaper/desktop.png'
+export const WALLPAPER_SRC = '/wallpaper/desktop.webp'
 
 /**
  * The wallpaper sits behind every pixel of the landing page and never scrolls

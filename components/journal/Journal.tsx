@@ -9,11 +9,11 @@ const INK = '#3a2a1c'
 const PIXEL = { fontFamily: 'var(--font-pixel)' }
 const pretty = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 
-/** One journal page: the Minecraft-style book-and-quill page (public/ui/journal-page.png, 900 × 1277). */
+/** One journal page: the Minecraft-style book-and-quill page (public/ui/journal-page.webp, 900 × 1277). */
 function Page({ children }: { children: ReactNode }) {
   return (
     <article className="relative w-[min(460px,88vw)] [container-type:inline-size]" style={{ aspectRatio: '900 / 1277' }}>
-      <Image src="/ui/journal-page.png" alt="" fill sizes="460px" priority className="pointer-events-none" />
+      <Image src="/ui/journal-page.webp" alt="" fill sizes="460px" priority className="pointer-events-none" />
       <div className="absolute inset-[9%_10%_12%] overflow-y-auto">{children}</div>
     </article>
   )
