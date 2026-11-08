@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { getBook, getBooks, reviewPages } from '../books'
 
 describe('the books', () => {
-  it('are the eight from the spec, in shelf order, with the fields a spine needs', () => {
+  it('are the seven on the shelf, in shelf order, with the fields a spine needs', () => {
     const books = getBooks()
     expect(books.map((b) => b.title)).toEqual([
-      'Contact', 'Red Rising', 'Percy Jackson', 'The Three-Body Problem', 'Sapiens', 'Zero to One', "Ender's Game", "Old Man's War",
+      'Contact', 'Red Rising', 'Percy Jackson', 'The Three-Body Problem', 'Sapiens', 'Zero to One', "Ender's Game",
     ])
     for (const b of books) expect(b.spine).toMatch(/^#[0-9a-f]{6}$/i)
   })

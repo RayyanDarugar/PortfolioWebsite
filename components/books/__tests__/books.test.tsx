@@ -36,7 +36,8 @@ describe('BookSpread', () => {
   })
 
   it('is in the server HTML', () => {
-    // React escapes apostrophes in HTML, so match the review without them.
-    expect(renderToString(<BookSpread book={books[0]} />)).toContain(books[0].review[0].split("'").pop())
+    // React escapes quotes and apostrophes in HTML, so match the longest run without them.
+    const run = books[0].review[0].split(/["']/).sort((a, b) => b.length - a.length)[0]
+    expect(renderToString(<BookSpread book={books[0]} />)).toContain(run)
   })
 })
